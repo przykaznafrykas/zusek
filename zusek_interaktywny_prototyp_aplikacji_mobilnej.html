@@ -1,0 +1,2368 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#007A3D" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="ZUSek" />
+  <title>ZUSek — Przewodnik Przyszłej Mamy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            zus: {
+              dark: '#006B38',
+              primary: '#007A3D',
+              hover: '#005C2E',
+              light: '#E6F4EC',
+              mint: '#D6EBE0',
+              bg: '#E8F3EE',
+              ivory: '#FAFAF7',
+              coral: '#E8533F',
+              coralLight: '#FDECE9'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(circle at 15% 15%, #D7ECE2 0%, #EBF5F0 50%, #D0E5DB 100%);
+      color: #1A2421;
+    }
+    /* Native PWA Standalone & Mobile Fullscreen Experience */
+    @media (max-width: 640px), (display-mode: standalone) {
+      body {
+        padding: 0 !important;
+        background: #FAFAF7 !important;
+      }
+      #wrapper-header, #wrapper-footer {
+        display: none !important;
+      }
+      #phone-frame {
+        max-width: 100% !important;
+        width: 100vw !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+      }
+      #phone-statusbar, #home-indicator-bar {
+        display: none !important;
+      }
+    }
+    /* Custom subtle scrollbar inside phone */
+    .phone-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+    .phone-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .phone-scroll::-webkit-scrollbar-thumb {
+      background: rgba(0, 122, 61, 0.2);
+      border-radius: 9999px;
+    }
+    .phone-scroll::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 122, 61, 0.4);
+    }
+    /* Smooth screen transition */
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .screen-enter {
+      animation: fadeSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes floatStork {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-4px); }
+    }
+    .stork-float {
+      animation: floatStork 3.4s ease-in-out infinite;
+    }
+    /* Range slider custom styling */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 8px;
+      border-radius: 999px;
+      background: #D6EBE0;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #007A3D;
+      border: 3px solid #FFFFFF;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      margin-top: -7px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between p-2 sm:p-4 overflow-x-hidden">
+
+  <!-- Top Controls Bar (Desktop / Wrapper controls) -->
+  <header id="wrapper-header" class="w-full max-w-5xl flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 mb-2 bg-white/80 backdrop-blur-md rounded-2xl shadow-sm border border-white/60">
+    <div class="flex items-center gap-3">
+      <div class="bg-[#007A3D] text-white font-extrabold text-sm px-2.5 py-1 rounded-lg tracking-tight shadow-xs">
+        ZUS
+      </div>
+      <div>
+        <h1 class="text-sm sm:text-base font-bold text-slate-800 leading-tight">ZUSek — Przewodnik Przyszłej Mamy</h1>
+        <p class="text-[11px] text-slate-500">Kliknij element na ekranie telefonu lub pobierz plik na urządzenie</p>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <!-- Role switcher (Mama / Tata) -->
+      <button onclick="toggleParentRole()" class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-zus-light transition flex items-center gap-1.5 cursor-pointer" title="Przełącz perspektywę Mama / Tata">
+        <span id="role-badge-icon">👩</span>
+        <span id="role-badge-label">Rola: Mama</span>
+      </button>
+
+      <!-- Quick stage switcher for testing -->
+      <button onclick="quickSwitchStage()" class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-zus-light text-zus-dark hover:bg-zus-mint transition flex items-center gap-1.5 cursor-pointer" title="Przełącz szybko między ciążą a 12. miesiącem życia">
+        <span id="quick-stage-dot" class="w-2 h-2 rounded-full bg-zus-primary"></span>
+        <span id="quick-stage-label">Etap: 12. tydz. ciąży</span>
+      </button>
+
+      <!-- Download App File Button -->
+      <button onclick="openDownloadAppModal()" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-[#007A3D] text-white hover:bg-[#005C2E] transition flex items-center gap-1.5 shadow-xs cursor-pointer" title="Pobierz aplikację na komputer lub telefon">
+        <span>⬇</span>
+        <span>Pobierz na telefon</span>
+      </button>
+
+      <!-- Fullscreen Toggle -->
+      <button id="fullscreen-btn" onclick="toggleFullscreenMode()" class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-slate-800 text-white hover:bg-slate-700 transition flex items-center gap-1.5 cursor-pointer">
+        <svg id="fs-icon-expand" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+        </svg>
+        <span id="fs-btn-text">Pełny ekran</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Center Stage: Smartphone Frame -->
+  <main id="stage-container" class="flex-1 flex items-center justify-center w-full my-auto">
+    <div id="phone-frame" class="relative w-full max-w-[405px] h-[820px] max-h-[85vh] bg-[#FAFAF7] rounded-[46px] shadow-[0_24px_60px_-12px_rgba(14,53,36,0.28),0_0_0_10px_#1E2623,0_0_0_12px_#3A4641] flex flex-col overflow-hidden transition-all duration-300">
+      
+      <!-- iOS Dynamic Island & Status Bar -->
+      <div id="phone-statusbar" class="shrink-0 bg-[#FAFAF7] px-6 pt-3 pb-1.5 flex items-center justify-between text-[12px] font-bold text-slate-800 select-none z-30">
+        <span id="clock-time">9:41</span>
+        <!-- Dynamic Island -->
+        <div class="w-24 h-6 bg-black rounded-full flex items-center justify-end px-2">
+          <div class="w-2.5 h-2.5 rounded-full bg-[#1a2b3c] border border-slate-700"></div>
+        </div>
+        <!-- Status Icons -->
+        <div class="flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M2 20h2V10H2v10zm4 0h2V7H6v13zm4 0h2V4h-2v16zm4 0h2V1h-2v19z"/></svg>
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 18c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm-4.9-2.3l1.4 1.4C9.4 16.4 10.6 16 12 16s2.6.4 3.5 1.1l1.4-1.4C15.6 14.6 13.9 14 12 14s-3.6.6-4.9 1.7zm-2.8-2.8l1.4 1.4C7.3 13 9.5 12 12 12s4.7 1 6.3 2.3l1.4-1.4C17.7 11.1 15 10 12 10s-5.7 1.1-7.7 2.9z"/></svg>
+          <div class="w-5 h-2.5 border border-slate-800 rounded-[3px] p-[1px] flex items-center">
+            <div class="w-full h-full bg-slate-800 rounded-[1px]"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- App Top Header (Hidden on Start screen for clean splash look, shown on tabs) -->
+      <div id="app-top-bar" class="hidden shrink-0 bg-[#FAFAF7]/95 backdrop-blur-xs px-4 py-2 flex items-center justify-between border-b border-slate-200/60 z-20">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="navigateTo('start')">
+          <div class="bg-[#007A3D] text-white font-extrabold text-xs px-2 py-0.5 rounded-md tracking-tight">ZUS</div>
+          <span class="text-xs font-bold text-slate-700">ZUSek</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <!-- In-phone Role Pill -->
+          <button onclick="toggleParentRole()" class="px-2.5 py-1 rounded-full bg-zus-light text-zus-dark text-[11px] font-bold border border-zus-mint hover:bg-zus-mint transition cursor-pointer">
+            <span id="phone-role-pill">👩 Mama</span>
+          </button>
+          <!-- AI Chat shortcut -->
+          <button onclick="openAiChatModal()" class="p-1.5 rounded-full bg-white hover:bg-zus-light text-zus-primary shadow-2xs border border-slate-100 transition cursor-pointer" title="Zapytaj Bociana ZUSka (AI)">
+            <span class="text-xs">💬</span>
+          </button>
+          <button onclick="openNotificationsModal()" class="relative p-1.5 rounded-full bg-white hover:bg-zus-light text-slate-700 shadow-2xs border border-slate-100 transition cursor-pointer" aria-label="Powiadomienia">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <span id="notif-badge" class="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#E8533F]"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Scrollable Screen Content -->
+      <div id="app-content" class="flex-1 overflow-y-auto phone-scroll relative">
+        <!-- Dynamic content injected here by JS -->
+      </div>
+
+      <!-- Toast Notification Banner inside Phone -->
+      <div id="phone-toast" class="pointer-events-none absolute top-14 left-4 right-4 z-50 flex justify-center transition-all duration-300 opacity-0 -translate-y-3">
+        <div class="bg-slate-900/95 text-white text-xs font-medium px-4 py-2.5 rounded-2xl shadow-lg flex items-center gap-2 max-w-[92%] backdrop-blur-xs">
+          <span class="w-2 h-2 rounded-full bg-[#34D399] shrink-0"></span>
+          <span id="phone-toast-text">Zapisano zmiany</span>
+        </div>
+      </div>
+
+      <!-- Modal / Bottom Sheet Overlay inside Phone -->
+      <div id="phone-modal-backdrop" class="hidden absolute inset-0 bg-slate-900/45 backdrop-blur-[2px] z-40 flex flex-col justify-end transition-opacity duration-200" onclick="closeModalOnBackdrop(event)">
+        <div id="phone-modal-sheet" class="bg-[#FAFAF7] rounded-t-[32px] max-h-[88%] flex flex-col shadow-2xl border-t border-white overflow-hidden animate-[fadeSlideUp_0.25s_ease-out]">
+          <!-- Modal handle -->
+          <div class="w-full pt-2.5 pb-1 flex justify-center shrink-0 cursor-pointer" onclick="closeModal()">
+            <div class="w-10 h-1.5 rounded-full bg-slate-300"></div>
+          </div>
+          <div id="phone-modal-body" class="p-5 pt-2 overflow-y-auto phone-scroll">
+            <!-- Modal content injected here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Tab Navigation Bar (5 Tabs) -->
+      <nav id="bottom-tab-bar" class="shrink-0 bg-white border-t border-slate-200/80 px-1.5 pt-2 pb-3.5 grid grid-cols-5 gap-0.5 z-30 select-none">
+        <button onclick="navigateTo('start')" data-tab="start" class="tab-btn flex flex-col items-center justify-center py-1 rounded-xl transition cursor-pointer text-zus-primary">
+          <svg class="w-5 h-5 mb-0.5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z" />
+            <path d="M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z" />
+          </svg>
+          <span class="text-[10px] font-bold">Start</span>
+        </button>
+
+        <button onclick="navigateTo('journey')" data-tab="journey" class="tab-btn flex flex-col items-center justify-center py-1 rounded-xl transition cursor-pointer text-slate-400 hover:text-slate-600">
+          <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span class="text-[10px] font-semibold">Moja droga</span>
+        </button>
+
+        <button onclick="navigateTo('benefits')" data-tab="benefits" class="tab-btn flex flex-col items-center justify-center py-1 rounded-xl transition cursor-pointer text-slate-400 hover:text-slate-600">
+          <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <span class="text-[10px] font-semibold">Świadczenia</span>
+        </button>
+
+        <button onclick="navigateTo('care')" data-tab="care" class="tab-btn flex flex-col items-center justify-center py-1 rounded-xl transition cursor-pointer text-slate-400 hover:text-slate-600">
+          <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span class="text-[10px] font-semibold">Opieka & Żłobki</span>
+        </button>
+
+        <button onclick="navigateTo('more')" data-tab="more" class="tab-btn flex flex-col items-center justify-center py-1 rounded-xl transition cursor-pointer text-slate-400 hover:text-slate-600">
+          <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+          </svg>
+          <span class="text-[10px] font-semibold">Więcej / AI</span>
+        </button>
+      </nav>
+
+      <!-- Home Indicator Bar -->
+      <div id="home-indicator-bar" class="bg-white pb-1.5 flex justify-center shrink-0">
+        <div class="w-32 h-1 bg-slate-800 rounded-full opacity-80"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Discreet Concept Footer -->
+  <footer id="wrapper-footer" class="w-full text-center py-1.5 mt-1">
+    <p class="text-[11px] text-slate-600 font-medium">
+      Prototyp koncepcyjny HackNation 2026 • Wstępna nawigacja po świadczeniach ZUS, nieoficjalna usługa.
+    </p>
+  </footer>
+
+  <!-- Application Logic & Templates -->
+  <script>
+    // ==========================================
+    // 1. STATE MANAGEMENT
+    // ==========================================
+    const appState = {
+      currentTab: 'start',
+      isFullscreen: false,
+      parentRole: 'mama', // 'mama' | 'tata'
+      // Stage: 'pregnancy' or 'postpartum'
+      phase: 'pregnancy',
+      pregnancyWeek: 12,
+      babyMonths: 12,
+      babyName: 'Zosia',
+      babyGender: 'dziewczynka',
+      selectedHospital: null,
+      selectedSchool: null,
+      hospitalBag: {
+        dowod: true,
+        kartaCiazy: true,
+        wynikiBadan: false,
+        koszulaPorod: false,
+        ubrankaMaluch: false,
+        fotelik: false
+      },
+      // Checklist items
+      pregnancyTasks: {
+        confirmed: true,
+        hospital: false,
+        school: false,
+        babyData: true,
+        benefitsPrep: false
+      },
+      postpartumTasks: {
+        usc: false,
+        pesel: false,
+        zcnaHealth: false,
+        application800: false,
+        aktywnyRodzic: false
+      },
+      // Benefits Quiz State
+      quiz: {
+        employed: 'umowa_praca', // 'umowa_praca', 'dzialalnosc', 'brak_etatu'
+        incomePerPerson: 1650,
+        childrenCount: 1
+      },
+      submittedSimulations: {
+        '800plus': false,
+        'becikowe': false,
+        'aktywny': false,
+        'rodzicielskie': false,
+        'dobrystart': false,
+        'opiekunczy': false
+      },
+      // Reminders / Alerts
+      reminders: {
+        pregnancyProtection: true,
+        usc21Days: true,
+        zcna7Days: true,
+        paternityLeave: true,
+        aktywny12Months: true
+      },
+      partnerShared: false,
+      // Maternity & Parental Leave Planner State
+      leavePlanner: {
+        rateOption: '81_5', // '81_5' or '100_70'
+        momWeeks: 43,
+        momGrossSalary: 6800,
+        dadGrossSalary: 7400
+      },
+      // Aktywny Rodzic & Nanny Care Module State
+      careModule: {
+        subTab: 'aktywny', // 'aktywny' | 'niania' | 'zlobki'
+        selectedVariant: 'praca', // 'praca' | 'zlobek' | 'dom'
+        bothParentsWorking: true,
+        disabilityCert: false,
+        nurseryFee: 1350,
+        nurseryFood: 320,
+        nannyGrossSalary: 3200,
+        minWage2026: 4806,
+        nannyDraft: {
+          parentName: 'Anna Kowalska',
+          nannyName: 'Maria Nowak (Babcia / Niania)',
+          nannyPesel: '640512*****',
+          startDate: '2026-12-01',
+          hoursPerWeek: 35,
+          submittedToZus: false
+        },
+        nurseryFilter: 'wszystkie' // 'wszystkie' | 'zlobek_pub' | 'zlobek_pryw' | 'dzienny'
+      },
+      // Sticker State
+      sticker: {
+        bgTheme: 'mint' // 'mint' | 'amber' | 'sky'
+      },
+      // AI Chat History
+      chatMessages: [
+        {
+          sender: 'bot',
+          text: 'Cześć! Jestem Bocian ZUSek 🕊️ Zapytaj mnie o 800+, program Aktywny Rodzic („babciowe”), umowę z nianią, urlop taty albo formalności po porodzie!'
+        }
+      ]
+    };
+
+    // Mock Data: Hospitals NFZ (with Kuyavian-Pomeranian + Poland)
+    const hospitalsData = [
+      {
+        id: 'szp_gru',
+        name: 'Regionalny Szpital Specjalistyczny im. dr. Wł. Biegańskiego',
+        city: 'Grudziądz • NFZ',
+        distance: '1,9 km',
+        rating: '4.8',
+        features: ['Nowoczesne sale jednoosobowe', 'Wsparcie doradcy laktacyjnego', 'Bezpłatne znieczulenie'],
+        note: 'Sprawdź aktualne warunki z placówką oraz listę rzeczy do torby porodowej.'
+      },
+      {
+        id: 'szp_byd',
+        name: 'Szpital Uniwersytecki nr 2 im. dr. J. Biziela',
+        city: 'Bydgoszcz • NFZ',
+        distance: '52 km',
+        rating: '4.9',
+        features: ['III stopień referencyjności', 'Opieka neonatologiczna', 'Porody rodzinne'],
+        note: 'Ośrodek o najwyższym stopniu referencyjności w woj. kujawsko-pomorskim.'
+      },
+      {
+        id: 'szp_tor',
+        name: 'Wojewódzki Szpital Zespolony im. L. Rydygiera',
+        city: 'Toruń • NFZ',
+        distance: '58 km',
+        rating: '4.7',
+        features: ['Szkoła rodzenia przy szpitalu', 'Kangurowanie po CC', 'Znieczulenie ZZO'],
+        note: 'Sprawdź aktualne warunki z placówką przed planowanym terminem porodu.'
+      },
+      {
+        id: 'szp_waw',
+        name: 'Szpital Specjalistyczny im. Św. Zofii',
+        city: 'Warszawa • NFZ',
+        distance: '240 km',
+        rating: '4.9',
+        features: ['Dom Narodzin', 'Znieczulenie ZZO 24/7', 'Sale porodów rodzinnych'],
+        note: 'Sprawdź aktualne warunki z placówką przed planowanym terminem porodu.'
+      }
+    ];
+
+    // Mock Data: Childbirth Schools
+    const schoolsData = [
+      {
+        id: 'sch1',
+        name: 'Bezpieczny Start — Szkoła Rodzenia NFZ (Grudziądz / Toruń)',
+        type: 'Stacjonarna • Bezpłatna (NFZ)',
+        schedule: 'Wtorki i czwartki, 17:30',
+        spots: '4 wolne miejsca'
+      },
+      {
+        id: 'sch2',
+        name: 'Akademia Mamy i Taty Online (Cała Polska)',
+        type: 'Online na żywo + nagrania VOD',
+        schedule: 'Dostęp 24/7 + konsultacje z położną',
+        spots: 'Zapisy otwarte'
+      }
+    ];
+
+    // Mock Data: Verified Nurseries & Day Carers (Rejestr Żłobków MRPiPS)
+    const nurseriesData = [
+      {
+        id: 'zl1',
+        name: 'Żłobek Miejski „Bajkowy Zakątek”',
+        category: 'zlobek_pub',
+        categoryLabel: 'Żłobek publiczny',
+        city: 'Grudziądz, ul. Chełmińska',
+        monthlyFee: 0,
+        foodFee: 280,
+        spots: '2 wolne miejsca od wrz.',
+        aktywnyBadge: '0 zł czesnego (dopłata 1500 zł pokrywa 100%)'
+      },
+      {
+        id: 'zl2',
+        name: 'Klub Dziecięcy „Mały Odkrywca”',
+        category: 'zlobek_pryw',
+        categoryLabel: 'Żłobek prywatny',
+        city: 'Bydgoszcz, Osiedle Leśne',
+        monthlyFee: 1450,
+        foodFee: 320,
+        spots: '3 wolne miejsca',
+        aktywnyBadge: 'Dopłata ZUS 1450 zł → Płacisz tylko wyżywienie!'
+      },
+      {
+        id: 'zl3',
+        name: 'Dzienny Opiekun — Pani Katarzyna (Certyfikat MRPiPS)',
+        category: 'dzienny',
+        categoryLabel: 'Dzienny opiekun',
+        city: 'Toruń, Wrzosy',
+        monthlyFee: 1200,
+        foodFee: 250,
+        spots: '1 wolne miejsce (grupa do 5 dzieci)',
+        aktywnyBadge: 'Objęty programem Aktywnie w żłobku (1200 zł dopłaty)'
+      },
+      {
+        id: 'zl4',
+        name: 'Niepubliczny Żłobek „Bocianie Gniazdo”',
+        category: 'zlobek_pryw',
+        categoryLabel: 'Żłobek prywatny',
+        city: 'Grudziądz, Lotnisko',
+        monthlyFee: 1650,
+        foodFee: 300,
+        spots: '4 wolne miejsca',
+        aktywnyBadge: 'Dopłata ZUS 1500 zł → Dopłacasz 150 zł + wyżywienie'
+      }
+    ];
+
+    // ==========================================
+    // 2. MASCOT SVG GENERATOR (White Polish Stork, Red Beak, Green ZUS Scarf)
+    // ==========================================
+    function getStorkSVG(sizeClass = 'w-28 h-28', withClipboard = false) {
+      return `
+        <svg class="${sizeClass} stork-float select-none drop-shadow-sm" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="105" r="78" fill="#D6EBE0" opacity="0.65"/>
+          <path d="M52 118C32 108 24 85 36 72C45 84 58 92 70 96L52 118Z" fill="#1E293B"/>
+          <path d="M62 115C44 103 38 82 48 70C56 80 68 89 78 94L62 115Z" fill="#FFFFFF"/>
+          <ellipse cx="102" cy="128" rx="36" ry="42" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+          <path d="M92 98C90 78 92 60 100 50C108 60 112 78 109 98Z" fill="#FFFFFF"/>
+          <circle cx="102" cy="48" r="22" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+          <path d="M106 44C108 41 112 41 114 44" stroke="#1E293B" stroke-width="2.6" stroke-linecap="round"/>
+          <ellipse cx="113" cy="52" rx="4.5" ry="2.5" fill="#FDA4AF" opacity="0.7"/>
+          <path d="M121 45L168 53L120 57C119 53 119 49 121 45Z" fill="#E8533F"/>
+          <path d="M121 53L164 53.5L120 57Z" fill="#C93B28"/>
+          <path d="M84 88C94 94 110 94 119 88L123 103C111 110 93 110 81 103L84 88Z" fill="#007A3D"/>
+          <path d="M86 101L72 124L85 127L95 105Z" fill="#006B38"/>
+          <path d="M97 104L91 131L105 131L106 104Z" fill="#007A3D"/>
+          <text x="102" y="101" text-anchor="middle" fill="#FFFFFF" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="10" letter-spacing="0.5">ZUS</text>
+          <path d="M132 115C154 105 166 86 156 72C146 82 134 90 122 95L132 115Z" fill="#1E293B"/>
+          <path d="M124 114C143 102 152 84 144 72C136 80 125 88 115 93L124 114Z" fill="#FFFFFF"/>
+          ${withClipboard ? `
+            <rect x="122" y="108" width="28" height="36" rx="4" fill="#007A3D" stroke="#FFFFFF" stroke-width="2"/>
+            <rect x="126" y="113" width="20" height="26" rx="2" fill="#FFFFFF"/>
+            <line x1="130" y1="119" x2="142" y2="119" stroke="#007A3D" stroke-width="2" stroke-linecap="round"/>
+            <line x1="130" y1="125" x2="142" y2="125" stroke="#007A3D" stroke-width="2" stroke-linecap="round"/>
+            <line x1="130" y1="131" x2="138" y2="131" stroke="#E8533F" stroke-width="2" stroke-linecap="round"/>
+          ` : ''}
+          <line x1="94" y1="168" x2="94" y2="188" stroke="#E8533F" stroke-width="3.5" stroke-linecap="round"/>
+          <line x1="110" y1="168" x2="110" y2="188" stroke="#E8533F" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M86 188H98M104 188H116" stroke="#E8533F" stroke-width="3.5" stroke-linecap="round"/>
+        </svg>
+      `;
+    }
+
+    // ==========================================
+    // 3. NAVIGATION & UI HELPERS
+    // ==========================================
+    function navigateTo(tabName) {
+      appState.currentTab = tabName;
+      closeModal();
+
+      const topBar = document.getElementById('app-top-bar');
+      if (tabName === 'start') {
+        topBar.classList.add('hidden');
+      } else {
+        topBar.classList.remove('hidden');
+      }
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        const isTarget = btn.getAttribute('data-tab') === tabName;
+        if (isTarget) {
+          btn.classList.remove('text-slate-400', 'hover:text-slate-600');
+          btn.classList.add('text-zus-primary');
+        } else {
+          btn.classList.add('text-slate-400', 'hover:text-slate-600');
+          btn.classList.remove('text-zus-primary');
+        }
+      });
+
+      renderCurrentScreen();
+      document.getElementById('app-content').scrollTop = 0;
+    }
+
+    function openCareSection(subTab) {
+      appState.careModule.subTab = subTab;
+      navigateTo('care');
+    }
+
+    let toastTimeout = null;
+    function showToast(message) {
+      const toast = document.getElementById('phone-toast');
+      const toastText = document.getElementById('phone-toast-text');
+      toastText.textContent = message;
+      toast.classList.remove('opacity-0', '-translate-y-3');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-3');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+      }, 2800);
+    }
+
+    function openModal(htmlContent) {
+      const backdrop = document.getElementById('phone-modal-backdrop');
+      const body = document.getElementById('phone-modal-body');
+      body.innerHTML = htmlContent;
+      backdrop.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      const backdrop = document.getElementById('phone-modal-backdrop');
+      backdrop.classList.add('hidden');
+    }
+
+    function closeModalOnBackdrop(e) {
+      if (e.target.id === 'phone-modal-backdrop') {
+        closeModal();
+      }
+    }
+
+    function toggleFullscreenMode() {
+      appState.isFullscreen = !appState.isFullscreen;
+      const phone = document.getElementById('phone-frame');
+      const header = document.getElementById('wrapper-header');
+      const footer = document.getElementById('wrapper-footer');
+      const btnText = document.getElementById('fs-btn-text');
+
+      if (appState.isFullscreen) {
+        phone.classList.remove('max-w-[405px]', 'h-[820px]', 'max-h-[85vh]', 'rounded-[46px]', 'shadow-[0_24px_60px_-12px_rgba(14,53,36,0.28),0_0_0_10px_#1E2623,0_0_0_12px_#3A4641]');
+        phone.classList.add('max-w-full', 'w-screen', 'h-screen', 'max-h-screen', 'rounded-none');
+        header.classList.add('hidden');
+        footer.classList.add('hidden');
+        document.body.classList.remove('p-2', 'sm:p-4');
+        document.body.classList.add('p-0');
+        addExitFullscreenPill();
+      } else {
+        phone.classList.add('max-w-[405px]', 'h-[820px]', 'max-h-[85vh]', 'rounded-[46px]', 'shadow-[0_24px_60px_-12px_rgba(14,53,36,0.28),0_0_0_10px_#1E2623,0_0_0_12px_#3A4641]');
+        phone.classList.remove('max-w-full', 'w-screen', 'h-screen', 'max-h-screen', 'rounded-none');
+        header.classList.remove('hidden');
+        footer.classList.remove('hidden');
+        document.body.classList.add('p-2', 'sm:p-4');
+        document.body.classList.remove('p-0');
+        btnText.textContent = 'Pełny ekran';
+        const pill = document.getElementById('exit-fs-pill');
+        if (pill) pill.remove();
+      }
+    }
+
+    function addExitFullscreenPill() {
+      if (document.getElementById('exit-fs-pill')) return;
+      const pill = document.createElement('button');
+      pill.id = 'exit-fs-pill';
+      pill.onclick = toggleFullscreenMode;
+      pill.className = 'fixed bottom-20 right-4 z-50 bg-slate-900/85 text-white text-xs font-semibold px-3 py-2 rounded-full shadow-lg backdrop-blur-xs cursor-pointer';
+      pill.textContent = '↙ Widok ramki';
+      document.body.appendChild(pill);
+    }
+
+    function toggleParentRole() {
+      appState.parentRole = appState.parentRole === 'mama' ? 'tata' : 'mama';
+      const isMama = appState.parentRole === 'mama';
+      document.getElementById('role-badge-icon').textContent = isMama ? '👩' : '👨';
+      document.getElementById('role-badge-label').textContent = isMama ? 'Rola: Mama' : 'Rola: Tata';
+      const phonePill = document.getElementById('phone-role-pill');
+      if (phonePill) phonePill.textContent = isMama ? '👩 Mama' : '👨 Tata';
+      renderCurrentScreen();
+      showToast(isMama ? 'Przełączono na perspektywę: Mama' : 'Przełączono na perspektywę: Tata (urlop ojcowski i 9 tyg.)');
+    }
+
+    function updateQuickStageIndicator() {
+      const label = document.getElementById('quick-stage-label');
+      if (appState.phase === 'pregnancy') {
+        label.textContent = `Etap: ${appState.pregnancyWeek}. tydz. ciąży`;
+      } else {
+        label.textContent = `Etap: Dziecko ${appState.babyMonths} mies.`;
+      }
+    }
+
+    function quickSwitchStage() {
+      if (appState.phase === 'pregnancy') {
+        appState.phase = 'postpartum';
+        appState.babyMonths = 12;
+        showToast('Tryb: Dziecko 12 mies. (Aktywny Rodzic)');
+      } else {
+        appState.phase = 'pregnancy';
+        appState.pregnancyWeek = 12;
+        showToast('Tryb: 12. tydzień ciąży');
+      }
+      updateQuickStageIndicator();
+      renderCurrentScreen();
+    }
+
+    // ==========================================
+    // 4. SCREEN RENDERERS
+    // ==========================================
+    function renderCurrentScreen() {
+      const container = document.getElementById('app-content');
+      switch (appState.currentTab) {
+        case 'start':
+          container.innerHTML = renderStartScreen();
+          break;
+        case 'journey':
+          container.innerHTML = renderJourneyScreen();
+          break;
+        case 'benefits':
+          container.innerHTML = renderBenefitsScreen();
+          break;
+        case 'care':
+          container.innerHTML = renderCareScreen();
+          break;
+        case 'more':
+          container.innerHTML = renderMoreScreen();
+          break;
+      }
+    }
+
+    // --- SCREEN 1: START / ONBOARDING ---
+    function renderStartScreen() {
+      const isMama = appState.parentRole === 'mama';
+      const stageBadge = appState.phase === 'pregnancy'
+        ? `Etap: ${appState.pregnancyWeek}. tydzień ciąży`
+        : `Etap: Dziecko (${appState.babyMonths} mies.)`;
+
+      return `
+        <div class="screen-enter min-h-full flex flex-col justify-between bg-gradient-to-b from-[#E3F2EA] via-[#F2F8F5] to-[#FAFAF7] px-5 pt-3 pb-6">
+          <!-- Top Logo, Role Toggle & Notification row -->
+          <div class="flex items-center justify-between">
+            <div class="bg-[#007A3D] text-white font-extrabold text-base px-3 py-1 rounded-xl tracking-tight shadow-xs">
+              ZUS
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button onclick="toggleParentRole()" class="px-2.5 py-1.5 rounded-full bg-white/95 text-zus-dark text-[11px] font-bold shadow-xs border border-zus-mint hover:bg-zus-light transition cursor-pointer">
+                ${isMama ? '👩 Mama' : '👨 Tata'}
+              </button>
+              <button onclick="openAiChatModal()" class="p-2 rounded-full bg-white/95 text-zus-primary shadow-xs hover:bg-white transition cursor-pointer" title="Czat AI">
+                <span class="text-xs">💬</span>
+              </button>
+              <button onclick="openNotificationsModal()" class="relative p-2 rounded-full bg-white/95 text-slate-700 shadow-xs hover:bg-white transition cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+                <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#E8533F]"></span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Hero Illustration Card -->
+          <div class="my-2 relative flex flex-col items-center justify-center">
+            <div class="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-full text-[11px] font-bold text-zus-dark shadow-2xs border border-zus-mint mb-1.5">
+              <span class="w-2 h-2 rounded-full bg-zus-primary"></span>
+              <span>${stageBadge}</span>
+            </div>
+
+            <div class="relative flex items-center justify-center">
+              ${getStorkSVG('w-36 h-36', true)}
+              <div class="absolute top-1 right-2 bg-white/90 p-1.5 rounded-2xl shadow-xs text-[#E8533F] text-xs">
+                💚
+              </div>
+            </div>
+          </div>
+
+          <!-- Welcome Copy & Actions -->
+          <div class="bg-white rounded-[28px] p-5 shadow-[0_8px_30px_rgba(0,92,46,0.06)] border border-slate-100">
+            <h2 class="text-[22px] font-extrabold text-slate-900 leading-tight">
+              Cześć ${isMama ? 'Mamo' : 'Tato'}! Jestem <span class="text-zus-primary">ZUSek</span> 🕊️
+            </h2>
+            <p class="mt-2 text-[13px] text-slate-600 leading-relaxed">
+              ${isMama
+                ? 'Poprowadzę Cię krok po kroku przez ciążę, poród, opiekunkę, żłobek i wszystkie świadczenia z ZUS.'
+                : 'Sprawdź swoje prawa: 2 tyg. urlopu ojcowskiego, 9 tyg. rodzicielskiego, 800+ i program Aktywny Rodzic.'}
+            </p>
+
+            <!-- Primary CTA -->
+            <button onclick="navigateTo('journey')" class="mt-4 w-full bg-[#007A3D] hover:bg-[#005C2E] active:scale-[0.99] text-white font-bold text-[14.5px] py-3 px-5 rounded-2xl shadow-md shadow-emerald-900/15 transition flex items-center justify-center gap-2 cursor-pointer">
+              <span>${isMama ? 'Zaczynamy Twoją drogę' : 'Zobacz plan dla Taty'}</span>
+              <span class="text-lg leading-none">→</span>
+            </button>
+
+            <!-- Secondary CTA: Aktywny Rodzic & Nanny shortcut -->
+            <button onclick="navigateTo('care')" class="mt-2.5 w-full bg-zus-light hover:bg-zus-mint text-zus-dark font-bold text-[13px] py-3 px-4 rounded-2xl border border-zus-mint transition flex items-center justify-center gap-1.5 cursor-pointer">
+              <span>🧸</span>
+              <span>Aktywny Rodzic, Niania i Żłobki</span>
+            </button>
+
+            <!-- Quick Feature Pills -->
+            <div class="mt-4 pt-3.5 border-t border-slate-100 grid grid-cols-3 gap-2 text-center">
+              <button onclick="openLeavePlannerModal()" class="p-2.5 rounded-xl bg-slate-50 hover:bg-zus-light transition cursor-pointer">
+                <div class="text-base">📅</div>
+                <div class="text-[11px] font-bold text-slate-700 mt-0.5">Planer urlopu</div>
+              </button>
+              <button onclick="openAiChatModal()" class="p-2.5 rounded-xl bg-slate-50 hover:bg-zus-light transition cursor-pointer">
+                <div class="text-base">💬</div>
+                <div class="text-[11px] font-bold text-slate-700 mt-0.5">Zapytaj ZUSka</div>
+              </button>
+              <button onclick="openNotificationsModal()" class="p-2.5 rounded-xl bg-slate-50 hover:bg-zus-light transition cursor-pointer">
+                <div class="text-base">🔔</div>
+                <div class="text-[11px] font-bold text-slate-700 mt-0.5">Terminy</div>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // --- SCREEN 2: MOJA DROGA (INTERACTIVE TIMELINE 1W PREGNANCY TO 36M CHILD) ---
+    function renderJourneyScreen() {
+      const isPreg = appState.phase === 'pregnancy';
+      const isMama = appState.parentRole === 'mama';
+      const babyDisplay = appState.babyName ? `dla maluszka: <strong>${escapeHTML(appState.babyName)}</strong>` : 'Podaj planowane imię i płeć';
+
+      return `
+        <div class="screen-enter px-5 pt-4 pb-8">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-2xl bg-zus-light flex items-center justify-center border border-zus-mint overflow-hidden shrink-0">
+                ${getStorkSVG('w-10 h-10', false)}
+              </div>
+              <div>
+                <h2 class="text-lg font-extrabold text-slate-900">
+                  ${isMama ? 'Twoja droga' : 'Ścieżka Taty'}
+                </h2>
+                <p class="text-xs font-semibold text-zus-primary">
+                  ${isPreg ? `Ciąża • ${appState.pregnancyWeek}. tydzień` : `Dziecko ma ${appState.babyMonths} mies.`}
+                </p>
+              </div>
+            </div>
+            <button onclick="openHospitalBagModal()" class="px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 text-[11px] font-bold text-slate-700 hover:bg-zus-light transition shadow-2xs cursor-pointer">
+              🎒 Torba do porodu
+            </button>
+          </div>
+
+          <!-- Interactive Timeline Slider Card -->
+          <div class="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs mb-4">
+            <div class="grid grid-cols-2 gap-1 bg-slate-100 p-1 rounded-xl mb-3">
+              <button onclick="setPhase('pregnancy')" class="py-1.5 px-2 rounded-lg text-[11px] font-bold transition cursor-pointer ${isPreg ? 'bg-white text-zus-dark shadow-2xs' : 'text-slate-600'}">
+                🤰 Ciąża (1–40 tydz.)
+              </button>
+              <button onclick="setPhase('postpartum')" class="py-1.5 px-2 rounded-lg text-[11px] font-bold transition cursor-pointer ${!isPreg ? 'bg-white text-zus-dark shadow-2xs' : 'text-slate-600'}">
+                👶 Dziecko (0–36 mies.)
+              </button>
+            </div>
+
+            ${isPreg ? `
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-[11px] font-bold text-slate-600">Przesuń oś czasu ciąży:</span>
+                <span class="text-xs font-extrabold text-zus-primary">${appState.pregnancyWeek}. tydzień</span>
+              </div>
+              <input type="range" min="1" max="40" value="${appState.pregnancyWeek}" class="w-full" oninput="liveUpdateTimeline(this.value, 'pregnancy')" />
+              <div class="flex justify-between text-[9.5px] text-slate-400 mt-1">
+                <span>1 tydz.</span>
+                <span>10 tydz. (becikowe)</span>
+                <span>24 tydz. (szkoła)</span>
+                <span>40 tydz.</span>
+              </div>
+            ` : `
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-[11px] font-bold text-slate-600">Wiek dziecka (0–36 mies.):</span>
+                <span class="text-xs font-extrabold text-zus-primary">${appState.babyMonths}. miesiąc</span>
+              </div>
+              <input type="range" min="0" max="36" value="${appState.babyMonths}" class="w-full" oninput="liveUpdateTimeline(this.value, 'postpartum')" />
+              <div class="flex justify-between text-[9.5px] text-slate-400 mt-1">
+                <span>0 (USC/PESEL)</span>
+                <span>12m (Aktywny Rodzic)</span>
+                <span>24m (Bilans)</span>
+                <span>36m (Przedszkole)</span>
+              </div>
+            `}
+          </div>
+
+          ${isPreg ? renderPregnancyTimeline(babyDisplay) : renderPostpartumTimeline()}
+        </div>
+      `;
+    }
+
+    function liveUpdateTimeline(val, mode) {
+      const num = parseInt(val, 10);
+      if (mode === 'pregnancy') {
+        appState.pregnancyWeek = num;
+      } else {
+        appState.babyMonths = num;
+      }
+      updateQuickStageIndicator();
+      renderCurrentScreen();
+    }
+
+    function renderPregnancyTimeline(babyDisplay) {
+      const t = appState.pregnancyTasks;
+      const isMama = appState.parentRole === 'mama';
+      const hospitalSub = appState.selectedHospital
+        ? `<span class="text-zus-primary font-semibold">Wybrano: ${escapeHTML(appState.selectedHospital.name)}</span>`
+        : 'Sprawdź porodówki NFZ w woj. kujawsko-pomorskim i Polsce.';
+
+      const schoolSub = appState.selectedSchool
+        ? `<span class="text-zus-primary font-semibold">Zapisano: ${escapeHTML(appState.selectedSchool.name)}</span>`
+        : 'Bezpłatne kursy NFZ oraz zajęcia online dla obojga rodziców.';
+
+      return `
+        ${!isMama ? `
+          <div class="mb-3.5 p-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-xs text-sky-950">
+            <div class="font-extrabold flex items-center gap-1.5">👨 Zadania Taty przed porodem:</div>
+            <p class="mt-1 text-[11.5px] leading-snug">
+              Zaplanuj <strong>2 tygodnie urlopu ojcowskiego</strong> (100% płatne) oraz <strong>9 tygodni nieprzenoszalnego urlopu rodzicielskiego</strong>. Możecie też wspólnie wybrać szpital i szkołę rodzenia!
+            </p>
+          </div>
+        ` : ''}
+
+        <div class="relative pl-6 space-y-3 before:content-[''] before:absolute before:left-[11px] before:top-4 before:bottom-4 before:w-0.5 before:bg-zus-mint">
+          
+          <div class="relative">
+            <button onclick="toggleTask('pregnancy', 'confirmed')" class="absolute -left-6 top-4 w-6 h-6 rounded-full flex items-center justify-center transition cursor-pointer ${t.confirmed ? 'bg-zus-primary text-white shadow-xs' : 'bg-white border-2 border-slate-300'}">
+              ${t.confirmed ? '✓' : ''}
+            </button>
+            <div onclick="toggleTask('pregnancy', 'confirmed')" class="p-3.5 rounded-2xl border transition cursor-pointer ${t.confirmed ? 'bg-[#E6F4EC] border-zus-mint' : 'bg-white border-slate-200/80 shadow-2xs'}">
+              <div class="flex items-center justify-between">
+                <h3 class="text-sm font-bold text-slate-900">1. Opieka lekarska i karta ciąży</h3>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white text-zus-dark">Do 10. tyg.</span>
+              </div>
+              <p class="text-xs text-slate-600 mt-1">Wizyta u lekarza lub położnej przed 10. tyg. jest wymagana do uzyskania Becikowego.</p>
+            </div>
+          </div>
+
+          <div class="relative">
+            <button onclick="toggleTask('pregnancy', 'hospital')" class="absolute -left-6 top-4 w-6 h-6 rounded-full flex items-center justify-center transition cursor-pointer ${t.hospital ? 'bg-zus-primary text-white shadow-xs' : 'bg-white border-2 border-zus-primary'}">
+              ${t.hospital ? '✓' : '<span class="w-2 h-2 rounded-full bg-zus-primary"></span>'}
+            </button>
+            <div onclick="openHospitalsModal()" class="p-3.5 rounded-2xl bg-white hover:bg-zus-light/40 border border-slate-200/80 shadow-2xs transition cursor-pointer flex items-center justify-between gap-3">
+              <div class="flex items-start gap-3">
+                <div class="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center text-base shrink-0">🏥</div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">2. Wybierz szpital na poród (NFZ)</h3>
+                  <p class="text-xs text-slate-500 mt-0.5 leading-snug">${hospitalSub}</p>
+                </div>
+              </div>
+              <span class="text-slate-400 font-bold">›</span>
+            </div>
+          </div>
+
+          <div class="relative">
+            <button onclick="toggleTask('pregnancy', 'school')" class="absolute -left-6 top-4 w-6 h-6 rounded-full flex items-center justify-center transition cursor-pointer ${t.school ? 'bg-zus-primary text-white shadow-xs' : 'bg-white border-2 border-slate-300'}">
+              ${t.school ? '✓' : ''}
+            </button>
+            <div onclick="openSchoolsModal()" class="p-3.5 rounded-2xl bg-white hover:bg-zus-light/40 border border-slate-200/80 shadow-2xs transition cursor-pointer flex items-center justify-between gap-3">
+              <div class="flex items-start gap-3">
+                <div class="w-9 h-9 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center text-base shrink-0">🎓</div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">3. Zapisz się do szkoły rodzenia</h3>
+                  <p class="text-xs text-slate-500 mt-0.5 leading-snug">${schoolSub}</p>
+                </div>
+              </div>
+              <span class="text-slate-400 font-bold">›</span>
+            </div>
+          </div>
+
+          <div class="relative">
+            <button onclick="toggleTask('pregnancy', 'babyData')" class="absolute -left-6 top-4 w-6 h-6 rounded-full flex items-center justify-center transition cursor-pointer ${t.babyData ? 'bg-zus-primary text-white shadow-xs' : 'bg-white border-2 border-slate-300'}">
+              ${t.babyData ? '✓' : ''}
+            </button>
+            <div onclick="openBabyDataModal()" class="p-3.5 rounded-2xl bg-white hover:bg-zus-light/40 border border-slate-200/80 shadow-2xs transition cursor-pointer flex items-center justify-between gap-3">
+              <div class="flex items-start gap-3">
+                <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-base shrink-0">👶</div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">4. Przygotuj dane dziecka</h3>
+                  <p class="text-xs text-slate-500 mt-0.5 leading-snug">${babyDisplay}</p>
+                </div>
+              </div>
+              <span class="text-slate-400 font-bold">›</span>
+            </div>
+          </div>
+
+          <div class="relative">
+            <button onclick="toggleTask('pregnancy', 'benefitsPrep')" class="absolute -left-6 top-4 w-6 h-6 rounded-full flex items-center justify-center transition cursor-pointer ${t.benefitsPrep ? 'bg-zus-primary text-white shadow-xs' : 'bg-white border-2 border-slate-300'}">
+              ${t.benefitsPrep ? '✓' : ''}
+            </button>
+            <div onclick="openLeavePlannerModal()" class="p-3.5 rounded-2xl bg-white hover:bg-zus-light/40 border border-slate-200/80 shadow-2xs transition cursor-pointer flex items-center justify-between gap-3">
+              <div class="flex items-start gap-3">
+                <div class="w-9 h-9 rounded-xl bg-emerald-50 text-zus-primary flex items-center justify-center text-base shrink-0">📅</div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">5. Zaplanuj urlop Mamy i Taty</h3>
+                  <p class="text-xs text-slate-500 mt-0.5 leading-snug">Kalkulator kwoty netto (81,5% vs 100%/70%) i podział tygodni.</p>
+                </div>
+              </div>
+              <span class="text-slate-400 font-bold">›</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPostpartumTimeline() {
+      const p = appState.postpartumTasks;
+      const m = appState.babyMonths;
+      const isMama = appState.parentRole === 'mama';
+      const babyTitle = appState.babyName ? `Maluszek: ${escapeHTML(appState.babyName)} (${m}. mies.)` : `Etap po porodzie (${m}. mies.)`;
+
+      let milestoneBanner = '';
+      if (m < 1) {
+        milestoneBanner = '🚨 Teraz najważniejsze: zgłoszenie narodzin w USC (21 dni) i ubezpieczenie zdrowotne ZUS ZCNA (7 dni).';
+      } else if (m < 12) {
+        milestoneBanner = `💡 Za ${12 - m} mies. dziecko ukończy 1. rok życia — wtedy rusza program Aktywny Rodzic (1500 zł lub 500 zł/mies.).`;
+      } else if (m <= 35) {
+        milestoneBanner = '🎉 Dziecko jest w wieku 12–35 mies.! Przysługuje Wam program Aktywny Rodzic (babciowe, żłobek lub w domu).';
+      } else {
+        milestoneBanner = '🎒 Wiek 36 miesięcy (3 lata): czas na przejście ze żłobka do przedszkola oraz coroczne świadczenie Dobry Start 300+ w wieku szkolnym.';
+      }
+
+      return `
+        <div class="bg-zus-light/85 border border-zus-mint rounded-2xl p-3.5 mb-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-zus-dark">${babyTitle}</span>
+            <span class="text-[10px] font-bold bg-white px-2 py-0.5 rounded-full text-zus-primary">${isMama ? 'Widok Mamy' : 'Widok Taty'}</span>
+          </div>
+          <p class="text-[11px] text-slate-700 mt-1 leading-snug">${milestoneBanner}</p>
+        </div>
+
+        <div class="relative pl-6 space-y-3 before:content-[''] before:absolute before:left-[11px] before:top-4 before:bottom-4 before:w-0.5 before:bg-zus-mint">
+          
+          <div class="relative">
+            <button onclick="toggleTask('postpartum', 'usc')" class="absolute -left-6 top-4 w-6 h-6 rounded-full flex items-center justify-center transition cursor-pointer ${p.usc ? 'bg-zus-primary text-white' : 'bg-white border-2 border-[#E8533F]'}">
+              ${p.usc ? '✓' : '<span class="w-2 h-2 rounded-full bg-[#E8533F]"></span>'}
+            </button>
+            <div onclick="openUscDetailsModal()" class="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:bg-zus-light/30 transition cursor-pointer">
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="text-sm font-bold text-slate-900">Zgłoszenie narodzin do USC</h3>
+                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-zus-coralLight text-[#E8533F]">21 dni</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-1">Online przez Profil Zaufany — od razu otrzymasz akt urodzenia i PESEL.</p>
+            </div>
+          </div>
+
+          <div class="relative">
+            <button onclick="toggleTask('postpartum', 'zcnaHealth')" class="absolute -left-6 top-4 w-6 h-6 rounded-full flex items-center justify-center transition cursor-pointer ${p.zcnaHealth ? 'bg-zus-primary text-white' : 'bg-white border-2 border-amber-500'}">
+              ${p.zcnaHealth ? '✓' : ''}
+            </button>
+            <div onclick="toggleTask('postpartum', 'zcnaHealth')" class="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs transition cursor-pointer">
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="text-sm font-bold text-slate-900">Zgłoszenie do NFZ (druk ZUS ZCNA)</h3>
+                <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">7 dni</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-1">Rodzic zgłasza dziecko u swojego pracodawcy lub w ZUS (przy działalności).</p>
+            </div>
+          </div>
+
+          <div class="relative">
+            <button onclick="toggleTask('postpartum', 'application800')" class="absolute -left-6 top-4 w-6 h-6 rounded-full flex items-center justify-center transition cursor-pointer ${p.application800 ? 'bg-zus-primary text-white' : 'bg-white border-2 border-slate-300'}">
+              ${p.application800 ? '✓' : ''}
+            </button>
+            <div onclick="openQuickApplicationModal('800plus')" class="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:bg-zus-light/30 transition cursor-pointer flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-bold text-slate-900">Wniosek o 800+ (3 kliknięcia)</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Masz 3 miesiące na złożenie wniosku z wyrównaniem od dnia porodu.</p>
+              </div>
+              <span class="text-slate-400 font-bold">›</span>
+            </div>
+          </div>
+
+          <div class="relative">
+            <button onclick="toggleTask('postpartum', 'aktywnyRodzic')" class="absolute -left-6 top-4 w-6 h-6 rounded-full flex items-center justify-center transition cursor-pointer ${p.aktywnyRodzic ? 'bg-zus-primary text-white' : 'bg-white border-2 border-slate-300'}">
+              ${p.aktywnyRodzic ? '✓' : ''}
+            </button>
+            <div onclick="navigateTo('care')" class="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:bg-zus-light/30 transition cursor-pointer flex items-center justify-between">
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <h3 class="text-sm font-bold text-slate-900">Aktywny Rodzic & Opiekunka</h3>
+                  <span class="text-[9.5px] font-bold px-1.5 py-0.5 rounded bg-zus-light text-zus-dark">12–35 mies.</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-0.5">Wybierz: 1500 zł w pracy (babcia/niania), żłobek lub 500 zł w domu.</p>
+              </div>
+              <span class="text-slate-400 font-bold">›</span>
+            </div>
+          </div>
+
+          <div class="relative">
+            <div class="absolute -left-6 top-4 w-6 h-6 rounded-full flex items-center justify-center bg-slate-100 text-slate-500 text-[10px] font-bold">
+              36m
+            </div>
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70">
+              <h3 class="text-xs font-bold text-slate-800">24. mies. (Bilans dwulatka) → 36. mies. (Przedszkole)</h3>
+              <p class="text-[11px] text-slate-500 mt-0.5">Po ukończeniu 35. miesiąca kończy się Aktywny Rodzic, a 800+ trwa nadal do 18. roku życia.</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // --- SCREEN 3: ŚWIADCZENIA DLA WASZEJ RODZINY ---
+    function renderBenefitsScreen() {
+      const q = appState.quiz;
+      const becikoweEligible = q.incomePerPerson <= 1922;
+      const macierzynskiEligible = q.employed !== 'brak_etatu';
+
+      return `
+        <div class="screen-enter px-5 pt-4 pb-8">
+          <div class="flex items-start justify-between gap-2 mb-3">
+            <div>
+              <h2 class="text-[21px] font-extrabold text-slate-900 leading-tight">
+                Świadczenia<br/>dla Waszej rodziny
+              </h2>
+              <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                Kliknij dowolne świadczenie, aby otworzyć kalkulator lub uproszczony szkic wniosku.
+              </p>
+            </div>
+            <div class="shrink-0 -mt-1">
+              ${getStorkSVG('w-18 h-18', true)}
+            </div>
+          </div>
+
+          <div class="mb-3 px-3 py-2 rounded-xl bg-amber-50/90 border border-amber-200/70 flex items-center justify-between gap-2">
+            <span class="text-[10.5px] font-semibold text-amber-900">ℹ️ Wstępna nawigacja, nie decyzja urzędowa</span>
+            <button onclick="openQuizModal()" class="text-[11px] font-extrabold text-zus-primary underline shrink-0 cursor-pointer">
+              Dopasuj profil
+            </button>
+          </div>
+
+          <div onclick="openQuizModal()" class="mb-3.5 p-3 rounded-2xl bg-white border border-slate-200/80 shadow-2xs flex items-center justify-between cursor-pointer hover:border-zus-primary/50 transition">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-zus-light text-zus-dark flex items-center justify-center font-bold text-sm">⚙️</div>
+              <div>
+                <div class="text-xs font-bold text-slate-800">Twój profil kwalifikacji</div>
+                <div class="text-[11px] text-slate-500">
+                  Dochód: <strong>${q.incomePerPerson} zł</strong>/os. • ${q.employed === 'umowa_praca' ? 'Etat' : q.employed === 'dzialalnosc' ? 'Działalność B2B' : 'Bez etatu'}
+                </div>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-zus-primary">Zmień ›</span>
+          </div>
+
+          <div class="space-y-3">
+            
+            <div onclick="openQuickApplicationModal('800plus')" class="p-3.5 rounded-2xl bg-[#E6F4EC] border border-zus-mint shadow-2xs transition cursor-pointer hover:shadow-sm">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-start gap-3">
+                  <div class="w-9 h-9 rounded-full bg-zus-primary text-white flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">✓</div>
+                  <div>
+                    <h3 class="text-sm font-extrabold text-slate-900">800+ (Rodzina 800+)</h3>
+                    <p class="text-xs text-slate-600 mt-0.5">800 zł co miesiąc na każde dziecko do 18. r.ż. bez progu dochodowego.</p>
+                    <div class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white text-zus-dark text-[11px] font-bold shadow-2xs">
+                      <span>${appState.submittedSimulations['800plus'] ? '✓ Szkic wysłany (symulacja)' : '⚡ Wniosek w 3 kliknięcia'}</span>
+                    </div>
+                  </div>
+                </div>
+                <span class="text-slate-500 font-bold text-lg">›</span>
+              </div>
+            </div>
+
+            <div onclick="navigateTo('care')" class="p-3.5 rounded-2xl bg-gradient-to-r from-[#E6F4EC] to-white border border-zus-primary/40 shadow-2xs transition cursor-pointer hover:shadow-sm">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-start gap-3">
+                  <div class="w-9 h-9 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center text-base shrink-0 mt-0.5">🧸</div>
+                  <div>
+                    <h3 class="text-sm font-extrabold text-slate-900">Aktywny Rodzic (1500 / 500 zł)</h3>
+                    <p class="text-xs text-slate-600 mt-0.5">Od 12. do 35. mies. życia: dopłata do niani/babci, żłobka lub opieki w domu.</p>
+                    <div class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zus-primary text-white text-[11px] font-bold">
+                      <span>Porównaj 3 warianty i nianię →</span>
+                    </div>
+                  </div>
+                </div>
+                <span class="text-slate-500 font-bold text-lg">›</span>
+              </div>
+            </div>
+
+            <div onclick="${macierzynskiEligible ? 'openLeavePlannerModal()' : "openQuickApplicationModal('rodzicielskie')"}" class="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs transition cursor-pointer hover:border-zus-primary/40">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-start gap-3">
+                  <div class="w-9 h-9 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center text-base shrink-0 mt-0.5">💼</div>
+                  <div>
+                    <h3 class="text-sm font-extrabold text-slate-900">
+                      ${macierzynskiEligible ? 'Zasiłek macierzyński (52 tyg.)' : 'Świadczenie rodzicielskie (Kosiniakowe)'}
+                    </h3>
+                    <p class="text-xs text-slate-600 mt-0.5">
+                      ${macierzynskiEligible
+                        ? 'Kalkulator netto dla Mamy i Taty (81,5% vs 100%/70%) + podział tygodni.'
+                        : '1000 zł/mies. przez 52 tygodnie dla studentek, bezrobotnych i umów o dzieło.'}
+                    </p>
+                    <div class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zus-light text-zus-dark text-[11px] font-bold">
+                      <span>${macierzynskiEligible ? '📅 Kalkulator zasiłku i urlopów' : '⚡ Wniosek w 3 kliknięcia'}</span>
+                    </div>
+                  </div>
+                </div>
+                <span class="text-slate-400 font-bold text-lg">›</span>
+              </div>
+            </div>
+
+            <div onclick="openQuickApplicationModal('becikowe')" class="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs transition cursor-pointer hover:border-zus-primary/40">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-start gap-3">
+                  <div class="w-9 h-9 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-base shrink-0 mt-0.5">🍼</div>
+                  <div>
+                    <h3 class="text-sm font-extrabold text-slate-900">Becikowe (1000 zł jednorazowo)</h3>
+                    <p class="text-xs text-slate-600 mt-0.5">Wypłacane przez gminę przy dochodzie ≤ 1922 zł netto na osobę.</p>
+                    <div class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-[11px] font-bold ${becikoweEligible ? 'text-zus-dark' : 'text-amber-700'}">
+                      <span>${becikoweEligible ? '✓ Spełniasz próg dochodowy' : '⚠️ Powyżej progu 1922 zł/os.'}</span>
+                    </div>
+                  </div>
+                </div>
+                <span class="text-slate-400 font-bold text-lg">›</span>
+              </div>
+            </div>
+
+            <div onclick="openQuickApplicationModal('opiekunczy')" class="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs transition cursor-pointer hover:border-zus-primary/40">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-start gap-3">
+                  <div class="w-9 h-9 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center text-base shrink-0 mt-0.5">🩺</div>
+                  <div>
+                    <h3 class="text-sm font-extrabold text-slate-900">Zasiłek opiekuńczy (60 dni/rok)</h3>
+                    <p class="text-xs text-slate-600 mt-0.5">80% podstawy wynagrodzenia podczas opieki nad chorym dzieckiem (druk Z-15A).</p>
+                    <div class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-semibold">
+                      <span>📄 Przygotuj wzór Z-15A</span>
+                    </div>
+                  </div>
+                </div>
+                <span class="text-slate-400 font-bold text-lg">›</span>
+              </div>
+            </div>
+
+            <div onclick="openQuickApplicationModal('dobrystart')" class="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs transition cursor-pointer hover:border-zus-primary/40">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-start gap-3">
+                  <div class="w-9 h-9 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-base shrink-0 mt-0.5">🎒</div>
+                  <div>
+                    <h3 class="text-sm font-extrabold text-slate-900">Dobry Start 300+ (wyprawka)</h3>
+                    <p class="text-xs text-slate-600 mt-0.5">300 zł raz w roku dla uczniów (przypomnienie na przyszłość — dla starszego rodzeństwa).</p>
+                    <div class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-semibold">
+                      <span>⚡ Wniosek w 3 kliknięcia</span>
+                    </div>
+                  </div>
+                </div>
+                <span class="text-slate-400 font-bold text-lg">›</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      `;
+    }
+
+    // --- SCREEN 4: OPIEKA & ŻŁOBKI (AKTYWNY RODZIC + NIANIA + REJESTR ŻŁOBKÓW) ---
+    function renderCareScreen() {
+      const cm = appState.careModule;
+
+      return `
+        <div class="screen-enter px-5 pt-4 pb-8">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h2 class="text-xl font-extrabold text-slate-900">Aktywny Rodzic & Opieka</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Dzieci 12–35 mies., niania, babcia i żłobki.</p>
+            </div>
+            <div class="w-10 h-10 rounded-2xl bg-zus-light flex items-center justify-center text-lg border border-zus-mint">🧸</div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-1 bg-slate-200/75 p-1 rounded-2xl mb-4">
+            <button onclick="setCareSubTab('aktywny')" class="py-2 px-1.5 rounded-xl text-[11px] font-extrabold transition cursor-pointer ${cm.subTab === 'aktywny' ? 'bg-white text-zus-dark shadow-2xs' : 'text-slate-600'}">
+              1. Aktywny Rodzic
+            </button>
+            <button onclick="setCareSubTab('niania')" class="py-2 px-1.5 rounded-xl text-[11px] font-extrabold transition cursor-pointer ${cm.subTab === 'niania' ? 'bg-white text-zus-dark shadow-2xs' : 'text-slate-600'}">
+              2. Niania / Babcia
+            </button>
+            <button onclick="setCareSubTab('zlobki')" class="py-2 px-1.5 rounded-xl text-[11px] font-extrabold transition cursor-pointer ${cm.subTab === 'zlobki' ? 'bg-white text-zus-dark shadow-2xs' : 'text-slate-600'}">
+              3. Żłobki (Rejestr)
+            </button>
+          </div>
+
+          ${cm.subTab === 'aktywny' ? renderAktywnyRodzicTab() : ''}
+          ${cm.subTab === 'niania' ? renderNannyTab() : ''}
+          ${cm.subTab === 'zlobki' ? renderNurseriesTab() : ''}
+        </div>
+      `;
+    }
+
+    function setCareSubTab(tab) {
+      appState.careModule.subTab = tab;
+      renderCurrentScreen();
+    }
+
+    function renderAktywnyRodzicTab() {
+      const cm = appState.careModule;
+      const pracaAmount = cm.disabilityCert ? 1900 : 1500;
+      const zlobekSubsidy = Math.min(cm.disabilityCert ? 1900 : 1500, cm.nurseryFee);
+      const parentNetNurseryCost = Math.max(0, cm.nurseryFee - zlobekSubsidy) + cm.nurseryFood;
+
+      return `
+        <div class="space-y-3.5">
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="selectAktywnyVariant('praca')" class="p-2.5 rounded-2xl border text-left transition cursor-pointer ${cm.selectedVariant === 'praca' ? 'bg-zus-light border-zus-primary shadow-2xs' : 'bg-white border-slate-200'}">
+              <div class="text-base">👵</div>
+              <div class="text-[11px] font-extrabold text-slate-900 mt-1 leading-tight">Aktywni w pracy</div>
+              <div class="text-xs font-extrabold text-zus-primary mt-1">${pracaAmount} zł</div>
+            </button>
+
+            <button onclick="selectAktywnyVariant('zlobek')" class="p-2.5 rounded-2xl border text-left transition cursor-pointer ${cm.selectedVariant === 'zlobek' ? 'bg-zus-light border-zus-primary shadow-2xs' : 'bg-white border-slate-200'}">
+              <div class="text-base">🏫</div>
+              <div class="text-[11px] font-extrabold text-slate-900 mt-1 leading-tight">Aktywnie w żłobku</div>
+              <div class="text-xs font-extrabold text-zus-primary mt-1">do ${cm.disabilityCert ? '1900' : '1500'} zł</div>
+            </button>
+
+            <button onclick="selectAktywnyVariant('dom')" class="p-2.5 rounded-2xl border text-left transition cursor-pointer ${cm.selectedVariant === 'dom' ? 'bg-zus-light border-zus-primary shadow-2xs' : 'bg-white border-slate-200'}">
+              <div class="text-base">🏡</div>
+              <div class="text-[11px] font-extrabold text-slate-900 mt-1 leading-tight">Aktywnie w domu</div>
+              <div class="text-xs font-extrabold text-zus-primary mt-1">500 zł</div>
+            </button>
+          </div>
+
+          <div onclick="toggleDisabilityCert()" class="p-3 rounded-2xl bg-white border border-slate-200 flex items-center justify-between cursor-pointer">
+            <div>
+              <div class="text-xs font-bold text-slate-800">Orzeczenie o niepełnosprawności dziecka</div>
+              <div class="text-[10.5px] text-slate-500">Podwyższa świadczenie z 1500 zł do 1900 zł/mies.</div>
+            </div>
+            <div class="w-10 h-5 rounded-full p-0.5 transition shrink-0 ${cm.disabilityCert ? 'bg-zus-primary' : 'bg-slate-300'}">
+              <div class="w-4 h-4 rounded-full bg-white transition-transform ${cm.disabilityCert ? 'translate-x-5' : 'translate-x-0'}"></div>
+            </div>
+          </div>
+
+          ${cm.selectedVariant === 'praca' ? `
+            <div class="p-4 rounded-2xl bg-white border border-zus-mint shadow-2xs space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold text-zus-dark">1. Aktywni rodzice w pracy („babciowe”)</span>
+                <span class="text-sm font-extrabold text-zus-primary">${pracaAmount} zł/mies.</span>
+              </div>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Świadczenie wypłacane bezpośrednio na konto rodziców, gdy oboje są aktywni zawodowo (etat, zlecenie, działalność B2B lub rolnik KRUS). Pieniądze możecie przeznaczyć np. na opiekę babci/dziadka lub niani!
+              </p>
+
+              <div onclick="toggleBothParentsWorking()" class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between cursor-pointer">
+                <span class="text-xs font-bold text-slate-800">Oboje rodzice pracują / opłacają składki ZUS</span>
+                <span class="text-xs font-extrabold ${cm.bothParentsWorking ? 'text-zus-primary' : 'text-[#E8533F]'}">
+                  ${cm.bothParentsWorking ? '✓ TAK (Spełnione)' : '✕ NIE'}
+                </span>
+              </div>
+
+              <div class="p-3 rounded-xl ${cm.bothParentsWorking ? 'bg-zus-light text-zus-dark' : 'bg-amber-50 text-amber-900'} text-xs font-semibold">
+                ${cm.bothParentsWorking
+                  ? `✓ Przysługuje Wam ${pracaAmount} zł/mies. przez 24 miesiące (od 12. do 35. mies. życia). Możecie też dodatkowo podpisać umowę uaktywniającą z nianią lub babcią!`
+                  : 'ℹ️ Jeśli jeden z rodziców nie pracuje zawodowo, sprawdź wariant „Aktywnie w żłobku” (do 1500 zł) lub „Aktywnie w domu” (500 zł).'}
+              </div>
+
+              <button onclick="setCareSubTab('niania')" class="w-full py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition cursor-pointer">
+                Przejdź do kalkulatora umowy z nianią / babcią →
+              </button>
+            </div>
+          ` : ''}
+
+          ${cm.selectedVariant === 'zlobek' ? `
+            <div class="p-4 rounded-2xl bg-white border border-zus-mint shadow-2xs space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold text-zus-dark">2. Aktywnie w żłobku (kalkulator dopłaty)</span>
+                <span class="text-xs font-bold bg-zus-light text-zus-dark px-2 py-0.5 rounded-full">Bez progu dochodu</span>
+              </div>
+              <p class="text-xs text-slate-600">
+                ZUS przelewa dopłatę bezpośrednio na konto żłobka, klubu dziecięcego lub dziennego opiekuna (do 1500 zł/mies., nie więcej niż czesne; wyżywienie opłaca rodzic).
+              </p>
+
+              <div class="space-y-2 pt-1">
+                <div>
+                  <div class="flex justify-between text-xs font-bold mb-1">
+                    <span class="text-slate-700">Miesięczne czesne za żłobek:</span>
+                    <span class="text-zus-primary">${cm.nurseryFee} zł</span>
+                  </div>
+                  <input type="range" min="0" max="2400" step="50" value="${cm.nurseryFee}" class="w-full" oninput="updateNurserySlider('fee', this.value)" />
+                </div>
+
+                <div>
+                  <div class="flex justify-between text-xs font-bold mb-1">
+                    <span class="text-slate-700">Wyżywienie (opłaca rodzic):</span>
+                    <span class="text-slate-800">${cm.nurseryFood} zł</span>
+                  </div>
+                  <input type="range" min="0" max="600" step="20" value="${cm.nurseryFood}" class="w-full" oninput="updateNurserySlider('food', this.value)" />
+                </div>
+              </div>
+
+              <div class="p-3 rounded-xl bg-zus-light/80 border border-zus-mint grid grid-cols-2 gap-2 text-center">
+                <div>
+                  <div class="text-[10px] font-bold text-slate-500 uppercase">Dopłata ZUS</div>
+                  <div class="text-base font-extrabold text-zus-primary">${zlobekSubsidy} zł</div>
+                </div>
+                <div>
+                  <div class="text-[10px] font-bold text-slate-500 uppercase">Twój koszt całkowity</div>
+                  <div class="text-base font-extrabold text-slate-900">${parentNetNurseryCost} zł</div>
+                </div>
+              </div>
+
+              <button onclick="setCareSubTab('zlobki')" class="w-full py-2.5 rounded-xl bg-[#007A3D] text-white text-xs font-bold hover:bg-[#005C2E] transition cursor-pointer">
+                Szukaj żłobka lub dziennego opiekuna w okolicy →
+              </button>
+            </div>
+          ` : ''}
+
+          ${cm.selectedVariant === 'dom' ? `
+            <div class="p-4 rounded-2xl bg-white border border-zus-mint shadow-2xs space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold text-zus-dark">3. Aktywnie w domu</span>
+                <span class="text-sm font-extrabold text-zus-primary">500 zł/mies.</span>
+              </div>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Wsparcie dla rodziców, którzy decydują się samodzielnie opiekować dzieckiem w domu (w wieku 12–35 miesięcy) i nie korzystają ze żłobka ani wariantu „Aktywni rodzice w pracy”.
+              </p>
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-1">
+                <div>✓ Przysługuje na <strong>każde</strong> dziecko w wieku 12–35 mies. (również pierwsze).</div>
+                <div>✓ Łączna kwota przez 24 miesiące: <strong>12 000 zł</strong> na dziecko.</div>
+                <div>✓ W każdej chwili możesz zmienić wariant na żłobek lub powrót do pracy!</div>
+              </div>
+              <button onclick="openQuickApplicationModal('aktywny')" class="w-full py-2.5 rounded-xl bg-[#007A3D] text-white text-xs font-bold hover:bg-[#005C2E] transition cursor-pointer">
+                Przygotuj szkic wniosku Aktywny Rodzic
+              </button>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function selectAktywnyVariant(v) {
+      appState.careModule.selectedVariant = v;
+      renderCurrentScreen();
+    }
+
+    function toggleDisabilityCert() {
+      appState.careModule.disabilityCert = !appState.careModule.disabilityCert;
+      renderCurrentScreen();
+    }
+
+    function toggleBothParentsWorking() {
+      appState.careModule.bothParentsWorking = !appState.careModule.bothParentsWorking;
+      renderCurrentScreen();
+    }
+
+    function updateNurserySlider(field, val) {
+      const num = parseInt(val, 10);
+      if (field === 'fee') appState.careModule.nurseryFee = num;
+      if (field === 'food') appState.careModule.nurseryFood = num;
+      renderCurrentScreen();
+    }
+
+    // Subtab 2: Nanny & Grandma Calculator + Activating Contract Generator
+    function renderNannyTab() {
+      const cm = appState.careModule;
+      const halfMinWage = Math.round(cm.minWage2026 / 2);
+      const coveredBase = Math.min(cm.nannyGrossSalary, halfMinWage);
+      const excessBase = Math.max(0, cm.nannyGrossSalary - halfMinWage);
+
+      const stateZusPaid = Math.round(coveredBase * 0.315);
+      const parentExtraZus = Math.round(excessBase * 0.175);
+      const nannyNetPay = Math.round(cm.nannyGrossSalary - (excessBase * 0.14));
+
+      return `
+        <div class="space-y-3.5">
+          <div class="p-3.5 rounded-2xl bg-zus-light/85 border border-zus-mint">
+            <h3 class="text-xs font-extrabold text-zus-dark">👵 Umowa uaktywniająca z Nianią lub Babcią</h3>
+            <p class="text-[11px] text-slate-700 mt-1 leading-snug">
+              ZUS opłaca z budżetu państwa składki emerytalne, rentowe, wypadkowe i zdrowotne za nianię (lub babcię/dziadka!) od podstawy do <strong>50% płacy minimalnej (${halfMinWage} zł)</strong>.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-slate-800">Wynagrodzenie brutto niani:</span>
+              <span class="text-sm font-extrabold text-zus-primary">${cm.nannyGrossSalary} zł</span>
+            </div>
+            <input type="range" min="1500" max="6000" step="100" value="${cm.nannyGrossSalary}" class="w-full" oninput="updateNannySalary(this.value)" />
+
+            <div class="grid grid-cols-3 gap-1.5 text-center pt-1">
+              <div class="p-2 rounded-xl bg-emerald-50 border border-emerald-100">
+                <div class="text-[9.5px] font-bold text-slate-500">ZUS płaci za Was</div>
+                <div class="text-xs font-extrabold text-zus-primary mt-0.5">+${stateZusPaid} zł</div>
+              </div>
+              <div class="p-2 rounded-xl bg-slate-50 border border-slate-200">
+                <div class="text-[9.5px] font-bold text-slate-500">Dopłata ZUS rodzica</div>
+                <div class="text-xs font-extrabold text-slate-800 mt-0.5">${parentExtraZus} zł</div>
+              </div>
+              <div class="p-2 rounded-xl bg-sky-50 border border-sky-100">
+                <div class="text-[9.5px] font-bold text-slate-500">Niania „na rękę”</div>
+                <div class="text-xs font-extrabold text-sky-900 mt-0.5">~${nannyNetPay} zł</div>
+              </div>
+            </div>
+
+            <p class="text-[10.5px] text-slate-500 leading-snug">
+              💡 <strong>Wskazówka:</strong> Babcia na emeryturze również może podpisać umowę uaktywniającą — odprowadzane składki podwyższą jej emeryturę, a Wy możecie równolegle pobierać 1500 zł z programu „Aktywni rodzice w pracy”!
+            </p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-2.5">
+            <h4 class="text-xs font-extrabold text-slate-900">📄 Kreator Umowy Uaktywniającej (ZUS ZUA/ZZA)</h4>
+            <div>
+              <label class="block text-[10.5px] font-bold text-slate-600 mb-0.5">Imię i nazwisko opiekunki / babci:</label>
+              <input type="text" value="${escapeHTML(cm.nannyDraft.nannyName)}" onchange="updateNannyField('nannyName', this.value)" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-slate-50 focus:bg-white focus:border-zus-primary focus:outline-none" />
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[10.5px] font-bold text-slate-600 mb-0.5">Data rozpoczęcia:</label>
+                <input type="date" value="${cm.nannyDraft.startDate}" onchange="updateNannyField('startDate', this.value)" class="w-full px-2.5 py-2 rounded-xl border border-slate-200 text-xs bg-slate-50" />
+              </div>
+              <div>
+                <label class="block text-[10.5px] font-bold text-slate-600 mb-0.5">Wymiar (godz./tydz.):</label>
+                <input type="number" min="5" max="40" value="${cm.nannyDraft.hoursPerWeek}" onchange="updateNannyField('hoursPerWeek', this.value)" class="w-full px-2.5 py-2 rounded-xl border border-slate-200 text-xs bg-slate-50" />
+              </div>
+            </div>
+
+            <button onclick="openNannyContractPreviewModal()" class="mt-2 w-full py-2.5 rounded-xl bg-[#007A3D] hover:bg-[#005C2E] text-white font-bold text-xs transition cursor-pointer">
+              Generuj wzór umowy i zgłoszenie ZUS →
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateNannySalary(val) {
+      appState.careModule.nannyGrossSalary = parseInt(val, 10);
+      renderCurrentScreen();
+    }
+
+    function updateNannyField(field, val) {
+      appState.careModule.nannyDraft[field] = val;
+    }
+
+    function openNannyContractPreviewModal() {
+      const cm = appState.careModule;
+      const child = appState.babyName ? escapeHTML(appState.babyName) : 'Dziecko (powyżej 20. tyg. życia)';
+      openModal(`
+        <div>
+          <span class="text-[10.5px] font-extrabold px-2.5 py-1 rounded-full bg-zus-light text-zus-dark">Projekt dokumentu • Art. 50 ustawy żłobkowej</span>
+          <h3 class="text-base font-extrabold text-slate-900 mt-2">Umowa Uaktywniająca z Nianią</h3>
+
+          <div class="mt-3 p-3.5 rounded-2xl bg-white border border-slate-200 text-[11.5px] text-slate-700 space-y-2 leading-relaxed font-mono">
+            <p><strong>STRONY UMOWY:</strong><br/>Rodzic: ${escapeHTML(cm.nannyDraft.parentName)}<br/>Niania: ${escapeHTML(cm.nannyDraft.nannyName)}</p>
+            <p><strong>PRZEDMIOT OPIEKI:</strong><br/>Sprawowanie opieki nad dzieckiem: <strong>${child}</strong> w wymiarze ${cm.nannyDraft.hoursPerWeek} godz. tygodniowo od dnia ${cm.nannyDraft.startDate}.</p>
+            <p><strong>WYNAGRODZENIE:</strong><br/>${cm.nannyGrossSalary} zł brutto miesięcznie (składki ZUS do 50% płacy minimalnej finansuje budżet państwa).</p>
+          </div>
+
+          <p class="mt-2.5 text-[10.5px] text-slate-500">
+            Po podpisaniu umowy masz <strong>7 dni</strong> na zgłoszenie niani w ZUS (formularz ZUS ZUA lub ZUS ZZA) przez eZUS / PUE.
+          </p>
+
+          <button onclick="closeModal(); showToast('Pobrano wzór Umowy Uaktywniającej (PDF)!')" class="mt-3.5 w-full py-3 rounded-2xl bg-[#007A3D] text-white font-bold text-xs cursor-pointer">
+            ⬇ Pobierz umowę (PDF) + instrukcję ZUS ZUA
+          </button>
+        </div>
+      `);
+    }
+
+    // Subtab 3: Verified Nurseries & Day Carers Registry
+    function renderNurseriesTab() {
+      const filter = appState.careModule.nurseryFilter;
+      const filtered = filter === 'wszystkie'
+        ? nurseriesData
+        : nurseriesData.filter(n => n.category === filter);
+
+      return `
+        <div class="space-y-3">
+          <div class="flex gap-1.5 overflow-x-auto pb-1">
+            <button onclick="setNurseryFilter('wszystkie')" class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold shrink-0 cursor-pointer ${filter === 'wszystkie' ? 'bg-zus-primary text-white' : 'bg-white border border-slate-200 text-slate-600'}">Wszystkie</button>
+            <button onclick="setNurseryFilter('zlobek_pub')" class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold shrink-0 cursor-pointer ${filter === 'zlobek_pub' ? 'bg-zus-primary text-white' : 'bg-white border border-slate-200 text-slate-600'}">Żłobki publiczne</button>
+            <button onclick="setNurseryFilter('zlobek_pryw')" class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold shrink-0 cursor-pointer ${filter === 'zlobek_pryw' ? 'bg-zus-primary text-white' : 'bg-white border border-slate-200 text-slate-600'}">Żłobki prywatne</button>
+            <button onclick="setNurseryFilter('dzienny')" class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold shrink-0 cursor-pointer ${filter === 'dzienny' ? 'bg-zus-primary text-white' : 'bg-white border border-slate-200 text-slate-600'}">Dzienny opiekun</button>
+          </div>
+
+          <div class="space-y-2.5">
+            ${filtered.map(n => `
+              <div class="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs">
+                <div class="flex items-start justify-between gap-2">
+                  <div>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">${n.categoryLabel}</span>
+                    <h4 class="text-xs font-extrabold text-slate-900 mt-1">${n.name}</h4>
+                    <p class="text-[11px] text-slate-500">📍 ${n.city}</p>
+                  </div>
+                  <span class="text-[10px] font-bold text-zus-dark bg-zus-light px-2 py-0.5 rounded-full shrink-0">${n.spots}</span>
+                </div>
+
+                <div class="mt-2 p-2 rounded-xl bg-emerald-50/80 text-[11px] font-semibold text-zus-dark">
+                  ✓ ${n.aktywnyBadge}
+                </div>
+
+                <div class="mt-2.5 flex items-center justify-between text-[11px] text-slate-600">
+                  <span>Czesne: <strong>${n.monthlyFee} zł</strong> + wyż. ${n.foodFee} zł</span>
+                  <button onclick="showToast('Wysłano zapytanie o rezerwację miejsca do: ${escapeHTML(n.name)}')" class="px-3 py-1.5 rounded-xl bg-slate-900 text-white font-bold text-[11px] hover:bg-slate-800 transition cursor-pointer">
+                    Zapytaj o miejsce
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function setNurseryFilter(f) {
+      appState.careModule.nurseryFilter = f;
+      renderCurrentScreen();
+    }
+
+    // --- SCREEN 5: WIĘCEJ / CZAT AI ZUSEK & NARZĘDZIA ---
+    function renderMoreScreen() {
+      return `
+        <div class="screen-enter px-5 pt-4 pb-8">
+          <div class="mb-3.5">
+            <h2 class="text-xl font-extrabold text-slate-900">Asystent AI & Narzędzia</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Zapytaj Bociana ZUSka, oblicz zasiłek lub sprawdź poradniki.</p>
+          </div>
+
+          <div onclick="openAiChatModal()" class="p-4 rounded-2xl bg-gradient-to-r from-[#007A3D] to-[#005C2E] text-white shadow-md cursor-pointer flex items-center justify-between gap-3 mb-4">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">Asystent AI na żywo</span>
+              <h3 class="text-base font-extrabold mt-1.5">Porozmawiaj z ZUSkiem 💬</h3>
+              <p class="text-[11.5px] text-emerald-100 mt-0.5">Zapytaj o babcię na umowie uaktywniającej, urlop taty, 800+ czy USC.</p>
+            </div>
+            <div class="w-14 h-14 rounded-full bg-white flex items-center justify-center shrink-0 shadow-xs">
+              ${getStorkSVG('w-12 h-12', false)}
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5 mb-4">
+            <button onclick="openLeavePlannerModal()" class="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:border-zus-primary transition text-left cursor-pointer">
+              <div class="w-9 h-9 rounded-xl bg-zus-light text-zus-primary flex items-center justify-center text-lg mb-2">📅</div>
+              <div class="text-xs font-extrabold text-slate-900">Kalkulator zasiłku i urlopu</div>
+              <div class="text-[10.5px] text-slate-500 mt-0.5">Netto mamy i taty (81,5% vs 100%)</div>
+            </button>
+
+            <button onclick="openCareSection('niania')" class="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:border-zus-primary transition text-left cursor-pointer">
+              <div class="w-9 h-9 rounded-xl bg-zus-light text-zus-primary flex items-center justify-center text-lg mb-2">👵</div>
+              <div class="text-xs font-extrabold text-slate-900">Kalkulator Niani / Babci</div>
+              <div class="text-[10.5px] text-slate-500 mt-0.5">Składki ZUS i umowa uaktywniająca</div>
+            </button>
+
+            <button onclick="openHospitalsModal()" class="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:border-zus-primary transition text-left cursor-pointer">
+              <div class="w-9 h-9 rounded-xl bg-zus-light text-zus-primary flex items-center justify-center text-lg mb-2">🏥</div>
+              <div class="text-xs font-extrabold text-slate-900">Szpitale NFZ & Torba</div>
+              <div class="text-[10.5px] text-slate-500 mt-0.5">Porodówki i checklista do szpitala</div>
+            </button>
+
+            <button onclick="openNotificationsModal()" class="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:border-zus-primary transition text-left cursor-pointer">
+              <div class="w-9 h-9 rounded-xl bg-zus-light text-zus-primary flex items-center justify-center text-lg mb-2">🔔</div>
+              <div class="text-xs font-extrabold text-slate-900">Przypomnienia o terminach</div>
+              <div class="text-[10.5px] text-slate-500 mt-0.5">21 dni USC, 7 dni ZCNA, 12m ZUS</div>
+            </button>
+
+            <button onclick="openStickerModal()" class="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:border-zus-primary transition text-left cursor-pointer">
+              <div class="w-9 h-9 rounded-xl bg-zus-light text-zus-primary flex items-center justify-center text-lg mb-2">🚗</div>
+              <div class="text-xs font-extrabold text-slate-900">Wlepka na auto</div>
+              <div class="text-[10.5px] text-slate-500 mt-0.5">„Wiozę młodego Obywatela!”</div>
+            </button>
+
+            <button onclick="openEducationVideoModal()" class="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:border-zus-primary transition text-left cursor-pointer">
+              <div class="w-9 h-9 rounded-xl bg-zus-light text-zus-primary flex items-center justify-center text-lg mb-2">▶️</div>
+              <div class="text-xs font-extrabold text-slate-900">Poradniki wideo</div>
+              <div class="text-[10.5px] text-slate-500 mt-0.5">Krótkie wyjaśnienia przepisów</div>
+            </button>
+          </div>
+
+          <!-- Download & Project Info Card -->
+          <div onclick="openDownloadAppModal()" class="p-4 rounded-2xl bg-white border border-zus-mint shadow-2xs cursor-pointer flex items-center justify-between gap-3 mb-3 hover:bg-zus-light/40 transition">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-zus-light text-zus-dark flex items-center justify-center text-lg shrink-0">📲</div>
+              <div>
+                <h3 class="text-xs font-extrabold text-slate-900">Pobierz plik aplikacji & O projekcie</h3>
+                <p class="text-[11px] text-slate-500 mt-0.5">Zapisz plik index.html na telefon lub GitHub Pages</p>
+              </div>
+            </div>
+            <span class="text-zus-primary font-bold">›</span>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-zus-light/80 border border-zus-mint text-center">
+            <p class="text-xs font-bold text-zus-dark">„Administracja, która sama Cię prowadzi.” 💚</p>
+            <p class="text-[10px] text-slate-500 mt-1">Koncepcja HackNation 2026 • Prototyp edukacyjno-nawigacyjny</p>
+          </div>
+        </div>
+      `;
+    }
+
+    // ==========================================
+    // 5. INTERACTIVE MODALS & ACTIONS
+    // ==========================================
+
+    function setPhase(phase) {
+      appState.phase = phase;
+      updateQuickStageIndicator();
+      renderCurrentScreen();
+    }
+
+    function toggleTask(group, key) {
+      if (group === 'pregnancy') {
+        appState.pregnancyTasks[key] = !appState.pregnancyTasks[key];
+      } else {
+        appState.postpartumTasks[key] = !appState.postpartumTasks[key];
+      }
+      renderCurrentScreen();
+      showToast('Zaktualizowano listę kroków');
+    }
+
+    // AI Chat Assistant Modal
+    function openAiChatModal() {
+      const msgsHTML = appState.chatMessages.map(m => `
+        <div class="flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}">
+          <div class="max-w-[85%] px-3.5 py-2.5 rounded-2xl text-xs leading-relaxed ${m.sender === 'user' ? 'bg-[#007A3D] text-white rounded-br-xs' : 'bg-white border border-slate-200 text-slate-800 rounded-bl-xs shadow-2xs'}">
+            ${m.text}
+          </div>
+        </div>
+      `).join('');
+
+      openModal(`
+        <div class="flex flex-col h-[520px] max-h-[75vh]">
+          <div class="flex items-center gap-2.5 pb-2.5 border-b border-slate-200/80 shrink-0">
+            <div class="w-9 h-9 rounded-full bg-zus-light flex items-center justify-center border border-zus-mint overflow-hidden">
+              ${getStorkSVG('w-8 h-8', false)}
+            </div>
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-900">Bocian ZUSek — Asystent AI</h3>
+              <p class="text-[10.5px] text-zus-primary font-semibold">● Online • Przewodnik po świadczeniach ZUS</p>
+            </div>
+          </div>
+
+          <div id="ai-chat-feed" class="flex-1 overflow-y-auto phone-scroll py-3 space-y-2.5">
+            ${msgsHTML}
+          </div>
+
+          <div class="py-2 flex gap-1.5 overflow-x-auto shrink-0 border-t border-slate-100">
+            <button onclick="sendAiQuestion('Czy babcia na emeryturze może być nianią na umowie uaktywniającej?')" class="px-2.5 py-1.5 rounded-xl bg-zus-light text-zus-dark text-[10.5px] font-bold shrink-0 hover:bg-zus-mint cursor-pointer">
+              👵 Babcia jako niania?
+            </button>
+            <button onclick="sendAiQuestion('Jak połączyć urlop rodzicielski taty z programem Aktywny Rodzic?')" class="px-2.5 py-1.5 rounded-xl bg-zus-light text-zus-dark text-[10.5px] font-bold shrink-0 hover:bg-zus-mint cursor-pointer">
+              👨 Urlop taty + Aktywny Rodzic
+            </button>
+            <button onclick="sendAiQuestion('Co z 800+ po urodzeniu drugiego dziecka?')" class="px-2.5 py-1.5 rounded-xl bg-zus-light text-zus-dark text-[10.5px] font-bold shrink-0 hover:bg-zus-mint cursor-pointer">
+              👶 800+ na drugie dziecko
+            </button>
+            <button onclick="sendAiQuestion('Ile dni mam na zgłoszenie dziecka w USC i ZUS?')" class="px-2.5 py-1.5 rounded-xl bg-zus-light text-zus-dark text-[10.5px] font-bold shrink-0 hover:bg-zus-mint cursor-pointer">
+              ⏱️ Terminy USC i ZUS
+            </button>
+          </div>
+
+          <form onsubmit="handleAiChatSubmit(event)" class="pt-1.5 flex gap-2 shrink-0">
+            <input id="ai-chat-input" type="text" placeholder="Wpisz pytanie o ZUS, urlop lub nianię..." class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs bg-white focus:outline-none focus:border-zus-primary" />
+            <button type="submit" class="px-4 py-2.5 rounded-xl bg-[#007A3D] text-white font-bold text-xs hover:bg-[#005C2E] cursor-pointer">
+              Wyślij
+            </button>
+          </form>
+        </div>
+      `);
+
+      const feed = document.getElementById('ai-chat-feed');
+      if (feed) feed.scrollTop = feed.scrollHeight;
+    }
+
+    function handleAiChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('ai-chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+      sendAiQuestion(text);
+    }
+
+    function sendAiQuestion(questionText) {
+      appState.chatMessages.push({ sender: 'user', text: escapeHTML(questionText) });
+      const answer = generateZusekAiReply(questionText);
+      appState.chatMessages.push({ sender: 'bot', text: answer });
+      openAiChatModal();
+    }
+
+    function generateZusekAiReply(q) {
+      const lower = q.toLowerCase();
+      if (lower.includes('babci') || lower.includes('emerytur') || lower.includes('niani')) {
+        return '<strong>Tak!</strong> Babcia lub dziadek (także na emeryturze) może być nianią na podstawie <strong>umowy uaktywniającej</strong> dla dziecka powyżej 20. tygodnia życia. ZUS opłaca wtedy składki od podstawy do 50% płacy minimalnej (co dolicza się do emerytury babci!), a rodzice mogą dodatkowo pobierać <strong>1500 zł/mies.</strong> z programu „Aktywni rodzice w pracy” od 12. miesiąca życia dziecka.';
+      }
+      if (lower.includes('tat') || lower.includes('ojc') || lower.includes('rodzicielsk')) {
+        return 'Tata ma prawo do <strong>2 tygodni urlopu ojcowskiego</strong> (100% płatnego, do 12. mies. życia dziecka) oraz <strong>9 tygodni nieprzenoszalnego urlopu rodzicielskiego</strong> (70%). Uwaga: podczas pobierania zasiłku macierzyńskiego/rodzicielskiego rodzic jest traktowany w programie <strong>Aktywny Rodzic</strong> jako aktywny zawodowo, więc po ukończeniu przez malucha 12. miesiąca możecie korzystać ze wsparcia!';
+      }
+      if (lower.includes('800') || lower.includes('drugi')) {
+        return 'Na nowo narodzone dziecko składasz osobny wniosek o <strong>800+</strong> (przez eZUS/PUE, bank lub Emp@tię). Masz na to <strong>3 miesiące od dnia urodzenia</strong> — wtedy ZUS wypłaci świadczenie z wyrównaniem od miesiąca porodu. Okres świadczeniowy na starsze dziecko biegnie swoim trybem (wnioski od 1 lutego na nowy okres).';
+      }
+      if (lower.includes('usc') || lower.includes('termin') || lower.includes('dni') || lower.includes('zcna')) {
+        return 'Najważniejsze terminy po porodzie:<br/>1. <strong>21 dni</strong> — zgłoszenie urodzenia dziecka w USC (online przez gov.pl — automatycznie nadawany jest PESEL).<br/>2. <strong>7 dni</strong> — zgłoszenie dziecka do ubezpieczenia zdrowotnego NFZ (druk <strong>ZUS ZCNA</strong> u pracodawcy lub w ZUS).<br/>3. <strong>21 dni</strong> — wniosek o zasiłek macierzyński/rodzicielski.<br/>4. <strong>3 miesiące</strong> — wniosek o 800+ z wyrównaniem.';
+      }
+      if (lower.includes('żłob') || lower.includes('zlob') || lower.includes('aktywny')) {
+        return 'Program <strong>Aktywny Rodzic</strong> (12–35 mies. życia) ma 3 warianty:<br/>• <strong>Aktywni rodzice w pracy:</strong> 1500 zł/mies. (1900 zł z orzeczeniem) dla pracujących rodziców.<br/>• <strong>Aktywnie w żłobku:</strong> dopłata do 1500 zł/mies. do czesnego w żłobku, klubie dziecięcym lub u dziennego opiekuna.<br/>• <strong>Aktywnie w domu:</strong> 500 zł/mies., gdy rodzic zostaje z dzieckiem w domu.';
+      }
+      return 'Świetne pytanie! W aplikacji ZUSek możesz sprawdzić ten temat w zakładce <strong>Świadczenia</strong> lub <strong>Opieka & Żłobki</strong>. Pamiętaj, że po narodzinach dziecka masz 21 dni na USC i 3 miesiące na wniosek 800+ z wyrównaniem. Chcesz, żebym przeliczył Twój zasiłek macierzyński albo dopłatę do żłobka?';
+    }
+
+    // Modal: Hospital Bag Checklist
+    function openHospitalBagModal() {
+      const b = appState.hospitalBag;
+      const items = [
+        { key: 'dowod', label: 'Dowód osobisty i numer PESEL' },
+        { key: 'kartaCiazy', label: 'Karta przebiegu ciąży i plan porodu' },
+        { key: 'wynikiBadan', label: 'Aktualne wyniki badań (grupa krwi, GBS, morfologia)' },
+        { key: 'koszulaPorod', label: 'Koszule do porodu i karmienia, szlafrok, klapki' },
+        { key: 'ubrankaMaluch', label: '3 komplety ubranek dla maluszka, pieluszki, rożek' },
+        { key: 'fotelik', label: 'Fotelik samochodowy na powrót ze szpitala' }
+      ];
+
+      openModal(`
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🎒</span>
+            <h3 class="text-lg font-extrabold text-slate-900">Torba do szpitala</h3>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Odznacz spakowane rzeczy przed wyjazdem na porodówkę.</p>
+          <div class="mt-3.5 space-y-2">
+            ${items.map(it => `
+              <div onclick="toggleBagItem('${it.key}')" class="p-3 rounded-xl border flex items-center gap-3 cursor-pointer ${b[it.key] ? 'bg-zus-light border-zus-mint' : 'bg-white border-slate-200'}">
+                <div class="w-5 h-5 rounded-md flex items-center justify-center text-xs font-bold ${b[it.key] ? 'bg-zus-primary text-white' : 'border border-slate-300 bg-white'}">
+                  ${b[it.key] ? '✓' : ''}
+                </div>
+                <span class="text-xs font-semibold ${b[it.key] ? 'line-through text-slate-500' : 'text-slate-800'}">${it.label}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `);
+    }
+
+    function toggleBagItem(key) {
+      appState.hospitalBag[key] = !appState.hospitalBag[key];
+      openHospitalBagModal();
+    }
+
+    // Modal: Quick Application in 3 Clicks
+    function openQuickApplicationModal(type) {
+      const childText = appState.babyName ? escapeHTML(appState.babyName) : 'Dziecko (PESEL po rejestracji w USC)';
+      const titles = {
+        '800plus': { name: 'Wniosek SW-R (Rodzina 800+)', amount: '800 zł / mies.', desc: 'Automatycznie pobieramy dane dziecka z rejestru PESEL oraz Twój numer rachunku bankowego.' },
+        'becikowe': { name: 'Wniosek o Becikowe (Gmina / MOPS)', amount: '1000 zł jednorazowo', desc: 'Wymaga zaświadczenia lekarskiego o opiece od min. 10. tyg. ciąży i dochodu ≤ 1922 zł/os.' },
+        'aktywny': { name: 'Wniosek AR (Program Aktywny Rodzic)', amount: '1500 zł lub 500 zł / mies.', desc: 'Składany od miesiąca, w którym dziecko kończy 12. miesiąc życia.' },
+        'rodzicielskie': { name: 'Wniosek SR-7 (Świadczenie rodzicielskie)', amount: '1000 zł / mies. (52 tyg.)', desc: 'Dla mam i tatów nieposiadających prawa do zasiłku macierzyńskiego (studenci, bezrobotni, umowa o dzieło).' },
+        'opiekunczy': { name: 'Wniosek ZUS Z-15A (Zasiłek opiekuńczy)', amount: '80% podstawy (do 60 dni/rok)', desc: 'Szybkie oświadczenie do wypłaty zasiłku podczas zwolnienia lekarskiego e-ZLA na chore dziecko.' },
+        'dobrystart': { name: 'Wniosek SW-D (Dobry Start 300+)', amount: '300 zł raz w roku', desc: 'Jednorazowe wsparcie na wyprawkę szkolną (wnioski od 1 lipca do 30 listopada).' }
+      };
+      const item = titles[type] || titles['800plus'];
+
+      openModal(`
+        <div>
+          <span class="text-[10.5px] font-extrabold px-2.5 py-1 rounded-full bg-zus-light text-zus-dark">Asystent wniosku w 3 kliknięcia</span>
+          <h3 class="text-base font-extrabold text-slate-900 mt-2">${item.name}</h3>
+          <p class="text-xs text-slate-600 mt-1 leading-relaxed">${item.desc}</p>
+
+          <div class="mt-3 p-3.5 rounded-2xl bg-white border border-slate-200 space-y-2 text-xs">
+            <div class="flex justify-between"><span class="text-slate-500">Kwota wsparcia:</span><strong class="text-zus-primary">${item.amount}</strong></div>
+            <div class="flex justify-between"><span class="text-slate-500">Wnioskodawca:</span><strong>${appState.parentRole === 'mama' ? 'Mama (Profil Zaufany)' : 'Tata (Profil Zaufany)'}</strong></div>
+            <div class="flex justify-between"><span class="text-slate-500">Dziecko:</span><strong>${childText}</strong></div>
+            <div class="flex justify-between"><span class="text-slate-500">Konto bankowe:</span><strong>PL 48 1020 •••• •••• 9104</strong></div>
+          </div>
+
+          <div class="mt-2.5 p-2.5 rounded-xl bg-amber-50 border border-amber-200/80 text-[10.5px] text-amber-900">
+            ⚠️ <strong>Prototyp koncepcyjny:</strong> Przycisk poniżej symuluje przygotowanie szkicu formularza w eZUS / mObywatel.
+          </div>
+
+          <button onclick="submitQuickSimulation('${type}')" class="mt-3 w-full py-3 rounded-2xl bg-[#007A3D] hover:bg-[#005C2E] text-white font-bold text-xs transition cursor-pointer">
+            ✓ Zatwierdź szkic wniosku (Symulacja eZUS)
+          </button>
+        </div>
+      `);
+    }
+
+    function submitQuickSimulation(type) {
+      appState.submittedSimulations[type] = true;
+      if (type === '800plus') appState.postpartumTasks.application800 = true;
+      closeModal();
+      renderCurrentScreen();
+      showToast('Szkic wniosku zapisany w profilu!');
+    }
+
+    // Modal: Hospitals NFZ
+    function openHospitalsModal() {
+      const cardsHTML = hospitalsData.map(h => {
+        const isSelected = appState.selectedHospital && appState.selectedHospital.id === h.id;
+        return `
+          <div class="p-3.5 rounded-2xl border transition ${isSelected ? 'bg-zus-light border-zus-primary' : 'bg-white border-slate-200/90'}">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <h4 class="text-xs font-extrabold text-slate-900">${h.name}</h4>
+                <p class="text-[11px] text-slate-500 mt-0.5">${h.city} • ${h.distance}</p>
+              </div>
+              <span class="px-2 py-0.5 rounded-lg bg-amber-50 text-amber-700 text-[11px] font-bold">★ ${h.rating}</span>
+            </div>
+            <div class="mt-2 flex flex-wrap gap-1">
+              ${h.features.map(f => `<span class="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-medium">${f}</span>`).join('')}
+            </div>
+            <p class="mt-2 text-[10.5px] text-slate-500 italic">ℹ️ ${h.note}</p>
+            <button onclick="selectHospital('${h.id}')" class="mt-2.5 w-full py-2 rounded-xl text-xs font-bold transition cursor-pointer ${isSelected ? 'bg-zus-primary text-white' : 'bg-zus-light text-zus-dark hover:bg-zus-mint'}">
+              ${isSelected ? '✓ Wybrano jako preferowany' : 'Wybierz ten szpital'}
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      openModal(`
+        <div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">🏥</span>
+              <h3 class="text-base font-extrabold text-slate-900">Szpitale położnicze (NFZ)</h3>
+            </div>
+            <button onclick="closeModal(); openHospitalBagModal();" class="text-[11px] font-bold text-zus-primary underline cursor-pointer">🎒 Torba</button>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Placówki w woj. kujawsko-pomorskim i Polsce.</p>
+          <div class="mt-3 space-y-2.5">
+            ${cardsHTML}
+          </div>
+        </div>
+      `);
+    }
+
+    function selectHospital(id) {
+      appState.selectedHospital = hospitalsData.find(h => h.id === id);
+      appState.pregnancyTasks.hospital = true;
+      closeModal();
+      renderCurrentScreen();
+      showToast('Zapisano wybrany szpital na liście!');
+    }
+
+    // Modal: Childbirth Schools
+    function openSchoolsModal() {
+      const cardsHTML = schoolsData.map(s => {
+        const isSelected = appState.selectedSchool && appState.selectedSchool.id === s.id;
+        return `
+          <div class="p-3.5 rounded-2xl border ${isSelected ? 'bg-zus-light border-zus-primary' : 'bg-white border-slate-200'}">
+            <h4 class="text-xs font-extrabold text-slate-900">${s.name}</h4>
+            <p class="text-[11px] text-zus-primary font-semibold mt-0.5">${s.type}</p>
+            <p class="text-[11px] text-slate-500 mt-1">🕒 ${s.schedule} • ${s.spots}</p>
+            <button onclick="selectSchool('${s.id}')" class="mt-2.5 w-full py-2 rounded-xl text-xs font-bold transition cursor-pointer ${isSelected ? 'bg-zus-primary text-white' : 'bg-slate-900 text-white hover:bg-slate-800'}">
+              ${isSelected ? '✓ Zapisano na kurs' : 'Zapisz się jednym kliknięciem'}
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      openModal(`
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🎓</span>
+            <h3 class="text-lg font-extrabold text-slate-900">Szkoły rodzenia</h3>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Bezpłatne zajęcia w ramach NFZ oraz wygodne kursy online.</p>
+          <div class="mt-3 space-y-3">
+            ${cardsHTML}
+          </div>
+        </div>
+      `);
+    }
+
+    function selectSchool(id) {
+      appState.selectedSchool = schoolsData.find(s => s.id === id);
+      appState.pregnancyTasks.school = true;
+      closeModal();
+      renderCurrentScreen();
+      showToast('Zapisano do szkoły rodzenia!');
+    }
+
+    // Modal: Baby Data Personalization
+    function openBabyDataModal() {
+      openModal(`
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl">👶</span>
+            <h3 class="text-lg font-extrabold text-slate-900">Dane dziecka</h3>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Wpisz planowane imię — ZUSek uzupełni szkice wniosków, umowę z nianią i wlepkę na auto.</p>
+
+          <div class="mt-4 space-y-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Planowane imię dziecka</label>
+              <input id="input-baby-name" type="text" placeholder="np. Zosia, Staś, Leoś..." value="${escapeHTML(appState.babyName)}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-zus-primary bg-white" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Płeć</label>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" onclick="setTempGender('dziewczynka', this)" class="gender-opt py-2 rounded-xl text-xs font-bold border cursor-pointer ${appState.babyGender === 'dziewczynka' ? 'bg-zus-light border-zus-primary text-zus-dark' : 'bg-white border-slate-200 text-slate-600'}">Dziewczynka</button>
+                <button type="button" onclick="setTempGender('chlopiec', this)" class="gender-opt py-2 rounded-xl text-xs font-bold border cursor-pointer ${appState.babyGender === 'chlopiec' ? 'bg-zus-light border-zus-primary text-zus-dark' : 'bg-white border-slate-200 text-slate-600'}">Chłopiec</button>
+                <button type="button" onclick="setTempGender('niespodzianka', this)" class="gender-opt py-2 rounded-xl text-xs font-bold border cursor-pointer ${appState.babyGender === 'niespodzianka' ? 'bg-zus-light border-zus-primary text-zus-dark' : 'bg-white border-slate-200 text-slate-600'}">Niespodzianka</button>
+              </div>
+            </div>
+          </div>
+
+          <button onclick="saveBabyData()" class="mt-5 w-full bg-[#007A3D] hover:bg-[#005C2E] text-white font-bold text-sm py-3 rounded-2xl transition cursor-pointer">
+            Zapisz dane dziecka
+          </button>
+        </div>
+      `);
+    }
+
+    function setTempGender(g, btn) {
+      appState.babyGender = g;
+      document.querySelectorAll('.gender-opt').forEach(el => {
+        el.classList.remove('bg-zus-light', 'border-zus-primary', 'text-zus-dark');
+        el.classList.add('bg-white', 'border-slate-200', 'text-slate-600');
+      });
+      btn.classList.add('bg-zus-light', 'border-zus-primary', 'text-zus-dark');
+      btn.classList.remove('bg-white', 'border-slate-200', 'text-slate-600');
+    }
+
+    function saveBabyData() {
+      const val = document.getElementById('input-baby-name').value.trim();
+      appState.babyName = val;
+      if (val) {
+        appState.pregnancyTasks.babyData = true;
+      }
+      closeModal();
+      renderCurrentScreen();
+      showToast(val ? `Zapisano dane dla: ${val}` : 'Zapisano ustawienia');
+    }
+
+    // Modal: USC 21 Days Info
+    function openUscDetailsModal() {
+      openModal(`
+        <div>
+          <span class="text-[11px] font-extrabold px-2.5 py-1 rounded-full bg-zus-coralLight text-[#E8533F]">Termin: 21 dni od porodu</span>
+          <h3 class="text-lg font-extrabold text-slate-900 mt-2">Zgłoszenie narodzin do USC</h3>
+          <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+            Szpital przekazuje kartę urodzenia do Urzędu Stanu Cywilnego w ciągu 3 dni. Rodzic ma <strong>21 dni</strong> na zarejestrowanie dziecka i nadanie imienia.
+          </p>
+          <div class="mt-3 p-3.5 rounded-2xl bg-zus-light/70 border border-zus-mint space-y-2 text-xs text-slate-700">
+            <div>✓ <strong>Online (gov.pl):</strong> Bez wychodzenia z domu, potrzebny Profil Zaufany.</div>
+            <div>✓ <strong>PESEL i zameldowanie:</strong> Nadawane automatycznie podczas rejestracji.</div>
+          </div>
+          <button onclick="toggleTask('postpartum', 'usc'); closeModal();" class="mt-4 w-full bg-[#007A3D] text-white font-bold text-sm py-3 rounded-2xl cursor-pointer">
+            Oznacz jako załatwione ✓
+          </button>
+        </div>
+      `);
+    }
+
+    // Modal: Eligibility Quiz
+    function openQuizModal() {
+      const q = appState.quiz;
+      openModal(`
+        <div>
+          <h3 class="text-lg font-extrabold text-slate-900">Kwestionariusz kwalifikacji</h3>
+          <p class="text-xs text-slate-500 mt-1">Odpowiedz na 2 pytania — podpowiem, które świadczenia warto sprawdzić.</p>
+
+          <div class="mt-4 space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-800 mb-1.5">1. Twoja sytuacja zawodowa:</label>
+              <div class="space-y-1.5">
+                <button onclick="setQuizEmployed('umowa_praca')" class="w-full text-left p-2.5 rounded-xl border text-xs font-semibold cursor-pointer ${q.employed === 'umowa_praca' ? 'bg-zus-light border-zus-primary text-zus-dark' : 'bg-white border-slate-200'}">
+                  Umowa o pracę (etat)
+                </button>
+                <button onclick="setQuizEmployed('dzialalnosc')" class="w-full text-left p-2.5 rounded-xl border text-xs font-semibold cursor-pointer ${q.employed === 'dzialalnosc' ? 'bg-zus-light border-zus-primary text-zus-dark' : 'bg-white border-slate-200'}">
+                  Własna działalność gospodarcza (B2B)
+                </button>
+                <button onclick="setQuizEmployed('brak_etatu')" class="w-full text-left p-2.5 rounded-xl border text-xs font-semibold cursor-pointer ${q.employed === 'brak_etatu' ? 'bg-zus-light border-zus-primary text-zus-dark' : 'bg-white border-slate-200'}">
+                  Brak etatu / studia / umowa o dzieło
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-xs font-bold text-slate-800">2. Dochód netto na osobę w rodzinie:</label>
+                <span id="quiz-income-val" class="text-xs font-extrabold text-zus-primary">${q.incomePerPerson} zł</span>
+              </div>
+              <input type="range" min="500" max="4500" step="50" value="${q.incomePerPerson}" class="w-full" oninput="updateQuizIncome(this.value)" />
+              <p class="text-[10px] text-slate-400 mt-1">Próg dochodowy dla Becikowego wynosi 1922 zł netto na osobę.</p>
+            </div>
+          </div>
+
+          <button onclick="closeModal(); renderCurrentScreen(); showToast('Zaktualizowano podpowiedzi świadczeń!');" class="mt-5 w-full bg-[#007A3D] text-white font-bold text-sm py-3 rounded-2xl cursor-pointer">
+            Zastosuj i zobacz wyniki
+          </button>
+        </div>
+      `);
+    }
+
+    function setQuizEmployed(val) {
+      appState.quiz.employed = val;
+      openQuizModal();
+    }
+
+    function updateQuizIncome(val) {
+      appState.quiz.incomePerPerson = parseInt(val, 10);
+      document.getElementById('quiz-income-val').textContent = `${val} zł`;
+    }
+
+    // Modal: Notifications & Rights Reminders
+    function openNotificationsModal() {
+      const r = appState.reminders;
+      openModal(`
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🔔</span>
+            <h3 class="text-lg font-extrabold text-slate-900">Przypomnienia o prawach</h3>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Włącz alerty, a ZUSek przypomni Ci o ważnych terminach.</p>
+
+          <div class="mt-4 space-y-2.5">
+            ${renderReminderToggle('pregnancyProtection', 'Ochrona stosunku pracy w ciąży', 'Informacja o prawach pracowniczych od 1. dnia ciąży.', r.pregnancyProtection)}
+            ${renderReminderToggle('usc21Days', 'Rejestracja w USC (21 dni po porodzie)', 'Alert o zgłoszeniu narodzin i nadaniu PESEL.', r.usc21Days)}
+            ${renderReminderToggle('zcna7Days', 'Zgłoszenie do NFZ ZUS ZCNA (7 dni)', 'Przypomnienie o ubezpieczeniu zdrowotnym maluszka.', r.zcna7Days)}
+            ${renderReminderToggle('paternityLeave', 'Urlop ojcowski (2 tygodnie)', 'Przypomnienie dla taty — do wykorzystania do 12. mies. życia.', r.paternityLeave)}
+            ${renderReminderToggle('aktywny12Months', 'Program Aktywny Rodzic (12. miesiąc)', 'Powiadomienie przed 1. urodzinami dziecka.', r.aktywny12Months)}
+          </div>
+        </div>
+      `);
+    }
+
+    function renderReminderToggle(key, title, desc, isOn) {
+      return `
+        <div onclick="toggleReminder('${key}')" class="p-3 rounded-2xl bg-white border border-slate-200 flex items-center justify-between gap-3 cursor-pointer">
+          <div>
+            <div class="text-xs font-bold text-slate-900">${title}</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">${desc}</div>
+          </div>
+          <div class="w-11 h-6 rounded-full p-0.5 transition shrink-0 ${isOn ? 'bg-zus-primary' : 'bg-slate-300'}">
+            <div class="w-5 h-5 rounded-full bg-white shadow-xs transition-transform ${isOn ? 'translate-x-5' : 'translate-x-0'}"></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleReminder(key) {
+      appState.reminders[key] = !appState.reminders[key];
+      openNotificationsModal();
+      showToast(appState.reminders[key] ? 'Włączono przypomnienie' : 'Wyłączono przypomnienie');
+    }
+
+    // Modal: Maternity & Parental Leave Calculator & Split Planner
+    function openLeavePlannerModal() {
+      const lp = appState.leavePlanner;
+      const dadWeeks = 52 - lp.momWeeks;
+
+      const momNetBase = Math.round(lp.momGrossSalary * 0.8629 * 0.88);
+      const dadNetBase = Math.round(lp.dadGrossSalary * 0.8629 * 0.88);
+
+      const momMonthly = lp.rateOption === '81_5'
+        ? Math.round(momNetBase * 0.815)
+        : `${momNetBase} zł (20 tyg.) → ${Math.round(momNetBase * 0.70)} zł`;
+
+      const dadMonthly = Math.round(dadNetBase * 0.70);
+      const dadPaternity2Weeks = Math.round(dadNetBase / 2);
+
+      openModal(`
+        <div>
+          <span class="text-[10.5px] font-extrabold px-2.5 py-1 rounded-full bg-zus-light text-zus-dark">Kalkulator netto • 52 tygodnie łącznie</span>
+          <h3 class="text-base font-extrabold text-slate-900 mt-1.5">Zasiłek macierzyński i podział urlopu</h3>
+
+          <div class="mt-3 p-3 rounded-2xl bg-white border border-slate-200 space-y-2.5">
+            <div>
+              <div class="flex justify-between text-[11px] font-bold">
+                <span class="text-slate-600">👩 Wynagrodzenie brutto Mamy:</span>
+                <span class="text-zus-primary">${lp.momGrossSalary} zł</span>
+              </div>
+              <input type="range" min="4806" max="18000" step="200" value="${lp.momGrossSalary}" class="w-full" oninput="updateLeaveSalary('mom', this.value)" />
+            </div>
+            <div>
+              <div class="flex justify-between text-[11px] font-bold">
+                <span class="text-slate-600">👨 Wynagrodzenie brutto Taty:</span>
+                <span class="text-sky-700">${lp.dadGrossSalary} zł</span>
+              </div>
+              <input type="range" min="4806" max="18000" step="200" value="${lp.dadGrossSalary}" class="w-full" oninput="updateLeaveSalary('dad', this.value)" />
+            </div>
+          </div>
+
+          <div class="mt-3 grid grid-cols-2 gap-2">
+            <button onclick="setLeaveRate('81_5')" class="p-2.5 rounded-xl border text-left transition cursor-pointer ${lp.rateOption === '81_5' ? 'bg-zus-light border-zus-primary' : 'bg-white border-slate-200'}">
+              <div class="text-xs font-extrabold text-slate-900">Stałe 81,5%</div>
+              <div class="text-[10px] text-slate-600 mt-0.5">Przez cały rok równa kwota</div>
+              <div class="text-[11px] font-extrabold text-zus-primary mt-1">Mama: ~${Math.round(momNetBase * 0.815)} zł/m</div>
+            </button>
+            <button onclick="setLeaveRate('100_70')" class="p-2.5 rounded-xl border text-left transition cursor-pointer ${lp.rateOption === '100_70' ? 'bg-zus-light border-zus-primary' : 'bg-white border-slate-200'}">
+              <div class="text-xs font-extrabold text-slate-900">100% + 70%</div>
+              <div class="text-[10px] text-slate-600 mt-0.5">20 tyg. 100%, potem 70%</div>
+              <div class="text-[11px] font-extrabold text-zus-primary mt-1">${momNetBase} → ${Math.round(momNetBase * 0.70)} zł</div>
+            </button>
+          </div>
+
+          <div class="mt-3 p-3 rounded-2xl bg-white border border-slate-200">
+            <div class="flex justify-between items-center mb-1.5">
+              <span class="text-xs font-bold text-slate-800">Podział 52 tygodni urlopu:</span>
+              <span class="text-[10px] font-bold text-zus-primary">9 tyg. taty chronione</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 my-1.5 text-center">
+              <div class="p-2 rounded-xl bg-rose-50/70 border border-rose-100">
+                <div class="text-[10px] font-bold text-rose-700 uppercase">Mama: ${lp.momWeeks} tyg.</div>
+                <div class="text-xs font-extrabold text-slate-900 mt-0.5">${typeof momMonthly === 'number' ? momMonthly + ' zł/m' : momMonthly}</div>
+              </div>
+              <div class="p-2 rounded-xl bg-sky-50/80 border border-sky-100">
+                <div class="text-[10px] font-bold text-sky-700 uppercase">Tata: ${dadWeeks} tyg.</div>
+                <div class="text-xs font-extrabold text-slate-900 mt-0.5">~${dadMonthly} zł/m (70%)</div>
+              </div>
+            </div>
+
+            <input type="range" min="20" max="43" value="${lp.momWeeks}" class="w-full" oninput="updateLeaveSplit(this.value)" />
+            <p class="text-[10.5px] text-slate-500 mt-1.5 leading-snug">
+              👨 Dodatkowo Tata ma <strong>2 tyg. urlopu ojcowskiego (100%)</strong> = ok. <strong>${dadPaternity2Weeks} zł netto</strong> za 2 tygodnie!
+            </p>
+          </div>
+
+          <button onclick="closeModal(); showToast('Zapisano kalkulację urlopu Mamy i Taty!');" class="mt-3 w-full bg-[#007A3D] hover:bg-[#005C2E] text-white font-bold text-xs py-3 rounded-2xl transition cursor-pointer">
+            Zapisz wybrany plan urlopu
+          </button>
+        </div>
+      `);
+    }
+
+    function updateLeaveSalary(who, val) {
+      const num = parseInt(val, 10);
+      if (who === 'mom') appState.leavePlanner.momGrossSalary = num;
+      if (who === 'dad') appState.leavePlanner.dadGrossSalary = num;
+      openLeavePlannerModal();
+    }
+
+    function setLeaveRate(opt) {
+      appState.leavePlanner.rateOption = opt;
+      openLeavePlannerModal();
+    }
+
+    function updateLeaveSplit(val) {
+      appState.leavePlanner.momWeeks = parseInt(val, 10);
+      openLeavePlannerModal();
+    }
+
+    // Modal: Download App File & Phone Setup Guide
+    function openDownloadAppModal() {
+      openModal(`
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="bg-[#007A3D] text-white font-extrabold text-xs px-2 py-0.5 rounded-md">ZUS</span>
+            <h3 class="text-base font-extrabold text-slate-900">Pobierz aplikację na telefon</h3>
+          </div>
+
+          <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+            Cała aplikacja <strong>ZUSek</strong> mieści się w jednym samodzielnym pliku <code class="bg-slate-100 px-1 rounded font-mono">index.html</code>. Możesz go pobrać poniżej i otworzyć bezpośrednio w przeglądarce na telefonie lub wrzucić na hosting.
+          </p>
+
+          <div class="mt-3 grid grid-cols-2 gap-2">
+            <button onclick="downloadIndexHtml()" class="py-3 px-3 rounded-xl bg-[#007A3D] hover:bg-[#005C2E] text-white font-bold text-xs shadow-xs transition cursor-pointer">
+              ⬇ Pobierz index.html
+            </button>
+            <button onclick="copyFullHtmlToClipboard()" class="py-3 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition cursor-pointer">
+              📋 Kopiuj kod HTML
+            </button>
+          </div>
+
+          <!-- Phone installation steps -->
+          <div class="mt-3 p-3.5 rounded-2xl bg-emerald-50/90 border border-zus-mint space-y-1.5 text-[11px] text-slate-700">
+            <div class="font-extrabold text-zus-dark">📱 Jak dodać skrót na ekran główny telefonu?</div>
+            <p><strong>1.</strong> Wrzuć pobrany plik <code class="bg-white px-1 rounded">index.html</code> na swój GitHub Pages lub wyślij na telefon.</p>
+            <p><strong>2. Android (Chrome):</strong> Otwórz stronę → menu <strong>⋮</strong> → <strong>„Dodaj do ekranu głównego”</strong>.</p>
+            <p><strong>3. iPhone (Safari):</strong> Otwórz stronę → przycisk <strong>Udostępnij (□↑)</strong> → <strong>„Do ekranu początkowego”</strong>.</p>
+          </div>
+
+          <!-- Official ZUS Press Note Quote -->
+          <div class="mt-3 p-3 rounded-2xl bg-white border border-slate-200 text-[11px] text-slate-600 leading-relaxed">
+            <p class="italic">
+              „«Przewodnik przyszłej mamy» – pod taką nazwą kryje się tegoroczne zadanie przygotowane przez ZUS. Polega ono na stworzeniu prostej i intuicyjnej aplikacji, która pomoże przyszłym i świeżo upieczonym rodzicom odnaleźć się w gąszczu przepisów dotyczących świadczeń, uprawnień i formalności związanych z ciążą oraz rodzicielstwem...”
+            </p>
+            <p class="mt-1.5 font-bold text-zus-dark text-[10.5px]">
+              — Krystyna Michałek, regionalna rzeczniczka prasowa ZUS w woj. kujawsko-pomorskim
+            </p>
+          </div>
+        </div>
+      `);
+    }
+
+    function downloadIndexHtml() {
+      const fullDoc = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([fullDoc], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'index.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Pobrano gotowy plik index.html!');
+    }
+
+    function copyFullHtmlToClipboard() {
+      const fullDoc = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const textarea = document.createElement('textarea');
+      textarea.value = fullDoc;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast('Skopiowano cały kod HTML do schowka!');
+      } catch (err) {
+        showToast('Użyj przycisku Pobierz index.html');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    // Modal: Education & Video Guides
+    function openEducationVideoModal() {
+      openModal(`
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl">▶️</span>
+            <h3 class="text-lg font-extrabold text-slate-900">Wsparcie i edukacja (wideo)</h3>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Krótkie, zrozumiałe wyjaśnienia bez urzędniczego żargonu.</p>
+
+          <div class="mt-3.5 space-y-2.5">
+            <div onclick="showToast('Odtwarzanie: Aktywny Rodzic — Babcia czy żłobek? (1:45)')" class="p-3 rounded-2xl bg-white border border-slate-200 flex items-center gap-3 cursor-pointer hover:border-zus-primary transition">
+              <div class="w-11 h-11 rounded-xl bg-zus-primary text-white flex items-center justify-center font-bold shrink-0">▶</div>
+              <div>
+                <div class="text-xs font-bold text-slate-900">Aktywny Rodzic — 1500 zł na babcię, nianię czy żłobek?</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Wideo • 1 min 45 sek</div>
+              </div>
+            </div>
+
+            <div onclick="showToast('Odtwarzanie: Jak złożyć wniosek o 800+ po porodzie (1:15)')" class="p-3 rounded-2xl bg-white border border-slate-200 flex items-center gap-3 cursor-pointer hover:border-zus-primary transition">
+              <div class="w-11 h-11 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold shrink-0">▶</div>
+              <div>
+                <div class="text-xs font-bold text-slate-900">Jak złożyć wniosek o 800+ w 3 minuty?</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Wideo • 1 min 15 sek</div>
+              </div>
+            </div>
+
+            <div onclick="showToast('Odtwarzanie: Pierwsze 21 dni po narodzinach (1:30)')" class="p-3 rounded-2xl bg-white border border-slate-200 flex items-center gap-3 cursor-pointer hover:border-zus-primary transition">
+              <div class="w-11 h-11 rounded-xl bg-[#E8533F] text-white flex items-center justify-center font-bold shrink-0">▶</div>
+              <div>
+                <div class="text-xs font-bold text-slate-900">USC, PESEL i ZUS ZCNA — kolejność kroków</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Wideo • 1 min 30 sek</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `);
+    }
+
+    // Modal: Car Sticker Generator
+    function openStickerModal() {
+      const theme = appState.sticker.bgTheme;
+      const bgClasses = {
+        mint: 'from-[#E6F4EC] to-white border-[#007A3D]',
+        amber: 'from-amber-100 to-white border-amber-500',
+        sky: 'from-sky-100 to-white border-sky-600'
+      };
+      const customLine = appState.babyName ? `Jedzie z nami: ${escapeHTML(appState.babyName)} 💚` : 'Wiozę młodego Obywatela!';
+
+      openModal(`
+        <div class="text-center">
+          <h3 class="text-lg font-extrabold text-slate-900">Wlepka na szybę auta</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Wybierz kolor tła i spersonalizuj naklejkę z ZUSkiem.</p>
+
+          <div class="mt-3 flex justify-center gap-2">
+            <button onclick="setStickerTheme('mint')" class="px-3 py-1 rounded-full text-xs font-bold border cursor-pointer ${theme === 'mint' ? 'bg-zus-light border-zus-primary text-zus-dark' : 'bg-white border-slate-200'}">🌿 Mięta ZUS</button>
+            <button onclick="setStickerTheme('amber')" class="px-3 py-1 rounded-full text-xs font-bold border cursor-pointer ${theme === 'amber' ? 'bg-amber-100 border-amber-500 text-amber-900' : 'bg-white border-slate-200'}">☀️ Słoneczny</button>
+            <button onclick="setStickerTheme('sky')" class="px-3 py-1 rounded-full text-xs font-bold border cursor-pointer ${theme === 'sky' ? 'bg-sky-100 border-sky-600 text-sky-900' : 'bg-white border-slate-200'}">☁️ Błękitny</button>
+          </div>
+
+          <div class="my-4 mx-auto w-48 h-48 rounded-full bg-gradient-to-b ${bgClasses[theme]} border-4 shadow-lg flex flex-col items-center justify-center p-3 relative">
+            ${getStorkSVG('w-24 h-24', false)}
+            <div class="mt-1 text-xs font-extrabold text-slate-900 leading-tight px-2">
+              ${customLine}
+            </div>
+            <div class="mt-1 text-[9px] font-bold text-zus-primary uppercase tracking-wider">ZUSek • Przewodnik</div>
+          </div>
+
+          <button onclick="closeModal(); showToast('Pobrano projekt wlepki PDF do druku!');" class="w-full bg-[#007A3D] hover:bg-[#005C2E] text-white font-bold text-sm py-3 rounded-2xl transition cursor-pointer">
+            Pobierz gotową wlepkę (PDF)
+          </button>
+        </div>
+      `);
+    }
+
+    function setStickerTheme(t) {
+      appState.sticker.bgTheme = t;
+      openStickerModal();
+    }
+
+    // Utility: Escape HTML
+    function escapeHTML(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Initialize app on load
+    window.onload = function () {
+      updateQuickStageIndicator();
+      navigateTo('start');
+    };
+  </script>
+</body>
+</html>
