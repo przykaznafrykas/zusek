@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <link rel="manifest" href="/zusek/manifest.json">
+<link rel="manifest" href="/zusek/manifest.json">
 <script>
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/zusek/sw.js');
-    });
+    navigator.serviceWorker.register('/zusek/sw.js');
   }
 </script>
   <meta charset="UTF-8" />
